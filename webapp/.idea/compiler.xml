@@ -10,7 +10,7 @@
       </profile>
     </annotationProcessing>
     <bytecodeTargetLevel>
-      <module name="ccwebapp" target="11" />
+      <module name="ccwebapp" target="8" />
     </bytecodeTargetLevel>
   </component>
   <component name="JavacSettings">
