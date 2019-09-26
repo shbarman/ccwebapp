@@ -5,5 +5,8 @@ import com.neu.ccwebapp.exceptions.UserExistsException;
 
 public interface UserService
 {
-    User registerUser(User user) throws UserExistsException;
+    void registerUser(User user) throws UserExistsException;
+
+    void updateUser(String name, User user) throws UserExistsException;
+    
 }
