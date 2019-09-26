@@ -28,7 +28,7 @@ public class UserServiceImpl implements UserService, UserDetailsService
     private PasswordEncoder passwordEncoder;
 
     @Override
-    public User registerUser(User user) throws UserExistsException {
+    public void registerUser(User user) throws UserExistsException {
         System.out.println("inside register");
         Optional<User> existingUser = userRepository.findById(user.getUsername());
         if(existingUser.isPresent()) {
@@ -37,7 +37,28 @@ public class UserServiceImpl implements UserService, UserDetailsService
 
         user.setPassword(passwordEncoder.encode(user.getPassword()));
         userRepository.save(user);
-        return user;
+
+    }
+    public void updateUser(String name, User user) throws UserExistsException {
+
+        String id = user.getUsername();
+
+
+
+        User userLoggedin = userRepository.findById(name).get();
+
+        if (userLoggedin.getUsername() == null) {
+
+            throw new UsernameNotFoundException("No user found with the username : " + name
+            );
+        } else {
+
+            userLoggedin.setUsername(user.getUsername());
+            userLoggedin.setFirst_name(user.getFirst_name());
+            userLoggedin.setLast_name(user.getLast_name());
+            userLoggedin.setPassword(passwordEncoder.encode(user.getPassword()));
+            userRepository.save(userLoggedin);
+        }
     }
 
     @Override
