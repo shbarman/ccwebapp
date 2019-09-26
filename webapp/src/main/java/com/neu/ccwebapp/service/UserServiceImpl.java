@@ -62,6 +62,15 @@ public class UserServiceImpl implements UserService, UserDetailsService
     }
 
     @Override
+    public User loadUsername(String userName) {
+
+        Optional<User> u = userRepository.findById(userName);
+        User filteredUser = u.get();
+
+        return filteredUser;
+    }
+
+    @Override
     public UserDetails loadUserByUsername(String userName) throws UsernameNotFoundException
     {
         Optional<User> user = userRepository.findById(userName);
