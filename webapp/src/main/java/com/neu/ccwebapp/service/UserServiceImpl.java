@@ -4,6 +4,8 @@ import com.neu.ccwebapp.domain.User;
 import com.neu.ccwebapp.exceptions.UserExistsException;
 import com.neu.ccwebapp.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -26,13 +28,16 @@ public class UserServiceImpl implements UserService, UserDetailsService
     private PasswordEncoder passwordEncoder;
 
     @Override
-    public void registerUser(User user) throws UserExistsException {
+    public User registerUser(User user) throws UserExistsException {
+        System.out.println("inside register");
         Optional<User> existingUser = userRepository.findById(user.getUsername());
         if(existingUser.isPresent()) {
             throw new UserExistsException("A user with username "+user.getUsername() + " already exists");
         }
+
         user.setPassword(passwordEncoder.encode(user.getPassword()));
         userRepository.save(user);
+        return user;
     }
 
     @Override
