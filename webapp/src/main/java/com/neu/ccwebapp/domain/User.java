@@ -14,22 +14,28 @@ import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
 import java.time.LocalDateTime;
-import java.util.UUID;
+import java.util.*;
 
 @Entity
 
 public class User
 {
+
     @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    @Column(columnDefinition = "BINARY(16)")
+    private UUID userID;
+
+
     @NotNull(message = "Username not provided")
     @Pattern(regexp = "^[_A-Za-z0-9-+]+(\\.[_A-Za-z0-9-]+)*@[A-Za-z0-9-]+(\\.[A-Za-z0-9]+)*(\\.[A-Za-z]{2,})$",message="Please provide a valid email address")
+    @Column(unique=true)
     private String username;
 
 
     /*@JsonIgnore*/
     @NotNull(message = "Password not provided")
     @ValidPassword
-
     private String password;
 
     @NotNull(message = "firstname not provided")
@@ -37,6 +43,22 @@ public class User
 
     @NotNull(message = "lastname not provided")
     private String last_name;
+
+    public LocalDateTime getAccount_updated() {
+        return account_updated;
+    }
+
+    public void setAccount_updated(LocalDateTime account_updated) {
+        this.account_updated = account_updated;
+    }
+
+    public LocalDateTime getAccount_created() {
+        return account_created;
+    }
+
+    public void setAccount_created(LocalDateTime account_created) {
+        this.account_created = account_created;
+    }
 
     @UpdateTimestamp
     @Column
@@ -81,4 +103,16 @@ public class User
     public void setLast_name(String last_name) {
         this.last_name = last_name;
     }
+
+
+    public UUID getUserID() {
+        return userID;
+    }
+
+    public void setUserID(UUID userID) {
+        this.userID = userID;
+    }
+
+
 }
+

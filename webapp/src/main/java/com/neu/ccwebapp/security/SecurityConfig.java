@@ -1,5 +1,6 @@
 package com.neu.ccwebapp.security;
 
+import com.neu.ccwebapp.validation.RecipeValidator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
@@ -26,6 +27,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter
         http.csrf().disable()
                 .authorizeRequests()
                 .antMatchers("/v1/user").permitAll()
+                .antMatchers("/v1/recipie","/v1/recipie/*").permitAll()
                 .anyRequest().authenticated()
                 .and()
                 .httpBasic()
@@ -45,5 +47,10 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
+    }
+
+    @Bean
+    public RecipeValidator recipeValidator(){
+        return new RecipeValidator();
     }
 }
