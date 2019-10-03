@@ -45,7 +45,7 @@ public class RecipeController {
     }
 
 
-    @RequestMapping(value = "/v1/recipe", method = RequestMethod.POST)
+    @RequestMapping(value = "/v1/recipie", method = RequestMethod.POST)
     public ResponseEntity<?> addRecipe(Principal principal, @Valid @RequestBody Recipe recipe, BindingResult errors,
                                        HttpServletResponse response) throws Exception {
         RecipeCreationErrors recipeCreationErrors;
@@ -71,7 +71,7 @@ public class RecipeController {
     }
 
 
-    @RequestMapping(value = "/v1/recipe/{id}", method = RequestMethod.GET)
+    @RequestMapping(value = "/v1/recipie/{id}", method = RequestMethod.GET)
     public ResponseEntity<?> getRecipePerAuthorId(@PathVariable UUID id) {
 
 
@@ -87,7 +87,7 @@ public class RecipeController {
 
     }
 
-    @RequestMapping(method = RequestMethod.PUT, value = "/v1/recipe/{id}") //Put request
+    @RequestMapping(method = RequestMethod.PUT, value = "/v1/recipie/{id}") //Put request
     public ResponseEntity<?> updateUser(Principal principal, @Valid @RequestBody Recipe recipe, BindingResult errors, @PathVariable UUID id) throws RecipeDoesNotExistException {
 
         String name = principal.getName();
@@ -115,23 +115,25 @@ public class RecipeController {
 
 }
 
-    @RequestMapping(value = "/v1/recipe/{id}", method = RequestMethod.DELETE)
+    @RequestMapping(value = "/v1/recipie/{id}", method = RequestMethod.DELETE)
     public ResponseEntity<?> deleteRecipeByAuthorId( @PathVariable UUID id,Principal principal) {
         String username = principal.getName();
         User userLoggedIn = userRepository.findByUsername(username);
-        Optional<Recipe> recipe = recipeService.findById(id);
-        UUID toBeDeletedRecipeId = recipe.get().getAuthorid();
 
-        if (!(recipe.isPresent())) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Recipe Not Found");
-        } else {
+        if (recipeService.findById(id).isPresent()) {
+
+            Optional<Recipe> recipe = recipeService.findById(id);
+
             if (userLoggedIn.getUserID().equals(recipe.get().getAuthorid())) {
                 recipeService.deleteByRecipesAuthorId(recipe.get().getRecipeId());
-                return ResponseEntity.status(HttpStatus.NO_CONTENT).body("Deleted Recipe");
+                return ResponseEntity.status(HttpStatus.NO_CONTENT).body("");
             } else {
-                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Not Authorized to delete recipe");
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("");
 
             }
+        } else {
+
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("");
 
         }
     }

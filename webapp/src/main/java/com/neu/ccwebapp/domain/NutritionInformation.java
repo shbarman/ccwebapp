@@ -20,21 +20,21 @@ public class NutritionInformation {
     private UUID id;
 
     @Column(nullable=false)
-    private int calories;
+    private Integer calories;
 
     @Column(nullable=false)
-    private float cholesterol_in_mg;
+    private Float cholesterol_in_mg;
 
     @Column(nullable=false)
-    private int sodium_in_mg;
+    private Integer sodium_in_mg;
 
     @Column(nullable=false)
-    private float carbohydrates_in_grams;
+    private Float carbohydrates_in_grams;
 
 
 
     @Column(nullable=false)
-    private float protein_in_grams;
+    private Float protein_in_grams;
 
 
     public NutritionInformation(int calories, float cholesterol_in_mg, int sodium_in_mg, float carbohydrates_in_grams, float protein_in_grams) {
@@ -59,7 +59,7 @@ public class NutritionInformation {
         this.id = id;
     }
 
-    public int getCalories() {
+    public Integer getCalories() {
         return calories;
     }
 
@@ -67,7 +67,7 @@ public class NutritionInformation {
         this.calories = calories;
     }
 
-    public float getCholesterol_in_mg() {
+    public Float getCholesterol_in_mg() {
         return cholesterol_in_mg;
     }
 
@@ -75,7 +75,7 @@ public class NutritionInformation {
         this.cholesterol_in_mg = cholesterol_in_mg;
     }
 
-    public int getSodium_in_mg() {
+    public Integer getSodium_in_mg() {
         return sodium_in_mg;
     }
 
@@ -83,7 +83,7 @@ public class NutritionInformation {
         this.sodium_in_mg = sodium_in_mg;
     }
 
-    public float getCarbohydrates_in_grams() {
+    public Float getCarbohydrates_in_grams() {
         return carbohydrates_in_grams;
     }
 
@@ -91,7 +91,7 @@ public class NutritionInformation {
         this.carbohydrates_in_grams = carbohydrates_in_grams;
     }
 
-    public float getProtein_in_grams() {
+    public Float getProtein_in_grams() {
         return protein_in_grams;
     }
 

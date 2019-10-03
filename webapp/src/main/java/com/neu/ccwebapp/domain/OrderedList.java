@@ -18,7 +18,7 @@ public class OrderedList {
     private UUID  orderID;
 
     @Column
-    private int position;
+    private Integer position;
 
     @Column
     private String items;
@@ -35,7 +35,7 @@ public class OrderedList {
 
 
 
-    public int getPosition() {
+    public Integer getPosition() {
         return position;
     }
 
