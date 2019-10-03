@@ -40,16 +40,16 @@ public class Recipe
     private UUID authorid;
 
     @Column
-    private int cook_time_in_min;
+    private Integer cook_time_in_min;
 
     @Column
     private String cuisine;
 
     @Column
-    private int prep_time_in_min;
+    private Integer prep_time_in_min;
 
     @Column
-    private int total_time_in_min;
+    private Integer total_time_in_min;
 
     @Column
     private String title;
@@ -58,7 +58,7 @@ public class Recipe
 
     @Column
     @Range(min=1, max=5)
-    private String servings;
+    private Integer servings;
 
     @ElementCollection
     @Column
@@ -123,7 +123,7 @@ public class Recipe
 
 
 
-    public int getCook_time_in_min() {
+    public Integer getCook_time_in_min() {
         return cook_time_in_min;
     }
 
@@ -140,7 +140,7 @@ public class Recipe
 
     }
 
-    public int getPrep_time_in_min() {
+    public Integer getPrep_time_in_min() {
         return prep_time_in_min;
     }
 
@@ -149,7 +149,7 @@ public class Recipe
         this.prep_time_in_min = prep_time_in_min;
     }
 
-    public int getTotal_time_in_min() {
+    public Integer getTotal_time_in_min() {
         return total_time_in_min;
     }
 
@@ -174,11 +174,11 @@ public class Recipe
         this.cuisine = cuisine;
     }
 
-    public String getServings() {
+    public Integer getServings() {
         return servings;
     }
 
-    public void setServings(String servings) {
+    public void setServings(int servings) {
         this.servings = servings;
     }
 
@@ -208,7 +208,7 @@ public class Recipe
 
 
 
-    public Recipe(Date created_ts, Date updated_ts, UUID authorid, int cook_time_in_min, int prep_time_in_min, int total_time_in_min, String title, String cuisine, @Range(min = 1, max = 5) String servings, List<String> ingredients, Set<OrderedList> steps, NutritionInformation nutritionInformation) {
+    public Recipe(Date created_ts, Date updated_ts, UUID authorid, Integer cook_time_in_min, Integer prep_time_in_min, Integer total_time_in_min, String title, String cuisine, @Range(min = 1, max = 5) Integer servings, List<String> ingredients, Set<OrderedList> steps, NutritionInformation nutritionInformation) {
         this.created_ts = created_ts;
         this.updated_ts = updated_ts;
         this.authorid = authorid;

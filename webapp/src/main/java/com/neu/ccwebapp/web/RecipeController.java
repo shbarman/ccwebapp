@@ -50,7 +50,7 @@ public class RecipeController {
                                        HttpServletResponse response) throws Exception {
         RecipeCreationErrors recipeCreationErrors;
         String username = principal.getName();
-        System.out.println("namee  is " + username);
+
         if (errors.hasErrors()) {
             recipeCreationErrors = recipeService.getRecipieCreationErrors(errors);
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(
@@ -115,9 +115,28 @@ public class RecipeController {
 
 }
 
+    @RequestMapping(value = "/v1/recipie/{id}", method = RequestMethod.DELETE)
+    public ResponseEntity<?> deleteRecipeByAuthorId( @PathVariable UUID id,Principal principal) {
+        String username = principal.getName();
+        User userLoggedIn = userRepository.findByUsername(username);
 
+        if (recipeService.findById(id).isPresent()) {
 
+            Optional<Recipe> recipe = recipeService.findById(id);
 
+            if (userLoggedIn.getUserID().equals(recipe.get().getAuthorid())) {
+                recipeService.deleteByRecipesAuthorId(recipe.get().getRecipeId());
+                return ResponseEntity.status(HttpStatus.NO_CONTENT).body("");
+            } else {
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("");
+
+            }
+        } else {
+
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("");
+
+        }
+    }
 
 
 }

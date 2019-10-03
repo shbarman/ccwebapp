@@ -5,6 +5,8 @@ import com.neu.ccwebapp.exceptions.RecipeCreationErrors;
 import com.neu.ccwebapp.exceptions.RecipeDoesNotExistException;
 import com.neu.ccwebapp.repository.RecipeRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
@@ -51,6 +53,15 @@ public class RecipeService {
 
 
     }
+
+    public void deleteByRecipesAuthorId(UUID recipeAuthorId)
+    {
+        Recipe toBeDeletedRecipe = recipeRepository.getOne(recipeAuthorId);
+        recipeRepository.delete(toBeDeletedRecipe);
+         ResponseEntity.status(HttpStatus.NO_CONTENT).body("Deleted Recipe");
+    }
+
+
 
     public void updateRecipe(Recipe recFound,Recipe recipe) throws RecipeDoesNotExistException {
 
