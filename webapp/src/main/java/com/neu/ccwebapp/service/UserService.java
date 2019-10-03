@@ -4,7 +4,8 @@ import com.neu.ccwebapp.domain.User;
 import com.neu.ccwebapp.exceptions.UserExistsException;
 import org.springframework.security.core.userdetails.UserDetails;
 
-public interface UserService
+public interface
+UserService
 {
     User registerUser(User user) throws UserExistsException;
 
