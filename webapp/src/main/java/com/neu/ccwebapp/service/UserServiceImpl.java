@@ -13,7 +13,13 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.ResponseBody;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -28,24 +34,29 @@ public class UserServiceImpl implements UserService, UserDetailsService
     private PasswordEncoder passwordEncoder;
 
     @Override
-    public void registerUser(User user) throws UserExistsException {
+    public User registerUser(User user) throws UserExistsException {
         System.out.println("inside register");
-        Optional<User> existingUser = userRepository.findById(user.getUsername());
-        if(existingUser.isPresent()) {
+        User existingUser = userRepository.findByUsername(user.getUsername());
+        if(existingUser!=null) {
             throw new UserExistsException("A user with username "+user.getUsername() + " already exists");
         }
 
         user.setPassword(passwordEncoder.encode(user.getPassword()));
         userRepository.save(user);
+        return user;
 
     }
+
+
+
+
     public void updateUser(String name, User user) throws UserExistsException {
 
         String id = user.getUsername();
 
 
 
-        User userLoggedin = userRepository.findById(name).get();
+        User userLoggedin = userRepository.findByUsername(name);
 
         if (userLoggedin.getUsername() == null) {
 
@@ -64,22 +75,21 @@ public class UserServiceImpl implements UserService, UserDetailsService
     @Override
     public User loadUsername(String userName) {
 
-        Optional<User> u = userRepository.findById(userName);
-        User filteredUser = u.get();
+        User u = userRepository.findByUsername(userName);
 
-        return filteredUser;
+        return u;
     }
 
     @Override
     public UserDetails loadUserByUsername(String userName) throws UsernameNotFoundException
     {
-        Optional<User> user = userRepository.findById(userName);
-        if(user.isPresent())
+        User user = userRepository.findByUsername(userName);
+        if(user==null)
         {
             throw new UsernameNotFoundException("No user found with the username : "+userName);
         }
         List<GrantedAuthority> authorities = new ArrayList<GrantedAuthority>();
         authorities.add(new SimpleGrantedAuthority("ROLE_USER"));
-        return new org.springframework.security.core.userdetails.User(user.get().getUsername(), user.get().getPassword(), authorities);
+        return new org.springframework.security.core.userdetails.User(user.getUsername(), user.getPassword(), authorities);
     }
 }
