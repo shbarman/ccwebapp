@@ -33,13 +33,14 @@ public class AppController {
     }
 
     @RequestMapping(method = RequestMethod.PUT, value = "/v1/user/self") //Put request
-    public void updateUser(Principal principal, @RequestBody User user) {
+    public ResponseEntity updateUser(Principal principal, @RequestBody User user) {
 
         String name = principal.getName();
 
         try {
 
             userService.updateUser( name, user);
+            return ResponseEntity.status(HttpStatus.NO_CONTENT).body(" ");
         } catch (UserExistsException e) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage(), e);
 

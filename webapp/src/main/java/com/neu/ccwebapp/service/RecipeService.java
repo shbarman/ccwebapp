@@ -2,6 +2,7 @@ package com.neu.ccwebapp.service;
 
 import com.neu.ccwebapp.domain.Recipe;
 import com.neu.ccwebapp.exceptions.RecipeCreationErrors;
+import com.neu.ccwebapp.exceptions.RecipeDoesNotExistException;
 import com.neu.ccwebapp.repository.RecipeRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -51,7 +52,33 @@ public class RecipeService {
 
     }
 
-}
+    public void updateRecipe(Recipe recFound,Recipe recipe) throws RecipeDoesNotExistException {
+
+        recFound.setAuthorid(recFound.getAuthorid());
+        recFound.setRecipeId(recFound.getRecipeId());
+        recFound.setCook_time_in_min(recipe.getCook_time_in_min());
+        recFound.setCuisine(recipe.getCuisine());
+
+        recFound.getIngredients().clear();
+        recFound.getIngredients().addAll(recipe.getIngredients());
+       // recFound.setIngredients(recipe.getIngredients());
+
+        recFound.setPrep_time_in_min(recipe.getPrep_time_in_min());
+        recFound.setTotal_time_in_min();
+        recFound.setNutritionInformation(recipe.getNutritionInformation());
+        recFound.setServings(recipe.getServings());
+
+        recFound.getSteps().clear();
+        recFound.getSteps().addAll(recipe.getSteps());
+        //recFound.setSteps(recipe.getSteps());
+
+        recFound.setTitle(recipe.getTitle());
+        recipeRepository.saveAndFlush(recFound);
+        //recipeRepository.save(recFound);
+        }
+    }
+
+
 
 
 

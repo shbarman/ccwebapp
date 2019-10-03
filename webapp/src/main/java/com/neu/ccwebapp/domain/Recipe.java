@@ -26,9 +26,11 @@ public class Recipe
     @Column(name = "recipeId", columnDefinition = "BINARY(16)")
     private UUID recipeId;
 
+    @CreationTimestamp
     @Column
     private Date created_ts;
 
+    @UpdateTimestamp
     @Column
     private Date updated_ts;
 
@@ -129,9 +131,7 @@ public class Recipe
         return steps;
     }
 
-    public void setSteps(Set<OrderedList> steps) {
-        this.steps = steps;
-    }
+    public void setSteps(Set<OrderedList> steps) { this.steps = steps; }
 
     public void setCook_time_in_min(int cook_time_in_min) {
 
@@ -186,9 +186,7 @@ public class Recipe
         return ingredients;
     }
 
-    public void setIngredients(List<String> ingredients) {
-        this.ingredients = ingredients;
-    }
+    public void setIngredients(List<String> ingredients) {this.ingredients = ingredients; }
 
 
 
@@ -197,6 +195,8 @@ public class Recipe
     }
 
     public void setNutritionInformation(NutritionInformation nutritionInformation) {
+
+
         this.nutritionInformation = nutritionInformation;
     }
 
