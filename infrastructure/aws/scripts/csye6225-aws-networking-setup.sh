@@ -1,10 +1,5 @@
 #!/bin/bash
 
-unset AWS_ACCESS_KEY_ID
-unset AWS_SECRET_ACCESS_KEY
-export AWS_PROFILE=dev
-
-
 #variables used in script:
 
 arguments=$@
@@ -12,7 +7,7 @@ arguments=$@
 
 if [ -z "$arguments" ]
 then
-	echo "\e[31m\e[1m ERROR : STACK NAME WAS NOT PROVIDED!\e[0m"
+	echo "----VPC NAME WAS NOT PROVIDED"
 	exit 1
 fi
 
@@ -33,16 +28,14 @@ echo $vpcName
 #create vpc with cidr block /16
 awsVPC_response=$(aws ec2 create-vpc --region "$awsRegion" --cidr-block "$vpcCidrBlock" --no-amazon-provided-ipv6-cidr-block --instance-tenancy default --output json)
 vpcId=$(echo -e "$awsVPC_response" |  /usr/bin/jq '.Vpc.VpcId' | tr -d '"')
-
 $(aws ec2 create-tags --resources "$vpcId" --tags Key=Name,Value="$vpcName")
-
 echo $awsVPC_response
 echo "---VPC CREATED----"
-
-
 $(aws ec2 modify-vpc-attribute --vpc-id "$vpcId" --enable-dns-hostname)
 $(aws ec2 modify-vpc-attribute --vpc-id "$vpcId" --enable-dns-support)
 
+
+#Creating subnets with subnet cidr block
 
 awsSubnet1_response=$(aws ec2 create-subnet --vpc-id "$vpcId" --cidr-block "$subnetCidrBlock1")
 
@@ -68,12 +61,14 @@ $(aws ec2 create-tags --resources "$subnet3Id" --tags Key=Name,Value="Subnet3")
 echo "----SUBNET 3 CREATED----"
 
 
-gateway_response=$(aws ec2 create-internet-gateway --output json)
 
+#Add Gateway
+gateway_response=$(aws ec2 create-internet-gateway --output json)
 gatewayId=$(echo -e "$gateway_response" |  /usr/bin/jq '.InternetGateway.InternetGatewayId' | tr -d '"')
 echo "-----GATEWAY CREATED----"
 
 
+#Attaching gateway to VPC
 attach_response=$(aws ec2 attach-internet-gateway --internet-gateway-id "$gatewayId" --vpc-id "$vpcId")
 
 echo "-----GATEWAY ATTACHED----"
