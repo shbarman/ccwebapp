@@ -26,8 +26,8 @@ terraform destroy
 
 ## Explanation
 
-export AWS_PROFILE = (env variable) -> to set the Profile for the current terraform session
-terraform init -> tells Terraform to scan the code and read the providers to be downloaded for the execution
-terraform plan -> to perform a refresh and create an execution plan
-terraform apply -> to create the required cidr blocks/vpcs and subnets
-terraform destroy -> destroys the mentioned vpc or subnet block
+1. export AWS_PROFILE = (env variable) -> to set the Profile for the current terraform session
+2. terraform init -> tells Terraform to scan the code and read the providers to be downloaded for the execution
+3. terraform plan -> to perform a refresh and create an execution plan
+4. terraform apply -> to create the required cidr blocks/vpcs and subnets
+5. terraform destroy -> destroys the mentioned vpc or subnet block
