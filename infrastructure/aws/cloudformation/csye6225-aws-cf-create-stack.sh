@@ -24,7 +24,7 @@ ParameterKey=vpcCidrBlock,ParameterValue=$4 \
 ParameterKey=subnet1CidrBlock,ParameterValue=$5 \
 ParameterKey=subnet2CidrBlock,ParameterValue=$6 \
 ParameterKey=subnet3CidrBlock,ParameterValue=$7 \
-)
+--on-failure DELETE)
 
 if [ $? -eq 0 ]
 then
