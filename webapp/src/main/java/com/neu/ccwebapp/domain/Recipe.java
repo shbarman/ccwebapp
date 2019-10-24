@@ -2,19 +2,11 @@ package com.neu.ccwebapp.domain;
 
 
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.neu.ccwebapp.validation.ValidPassword;
 import org.hibernate.annotations.CreationTimestamp;
-import org.hibernate.annotations.GenericGenerator;
 import org.hibernate.annotations.UpdateTimestamp;
 import org.hibernate.validator.constraints.Range;
 
 import javax.persistence.*;
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Pattern;
-import java.time.LocalDateTime;
 import java.util.*;
 
 @Entity
@@ -53,6 +45,10 @@ public class Recipe
 
     @Column
     private String title;
+
+
+    @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    private RecipeImage image;
 
 
 
@@ -138,6 +134,15 @@ public class Recipe
         this.cook_time_in_min = cook_time_in_min;
 
 
+    }
+
+
+    public RecipeImage getImage() {
+        return image;
+    }
+
+    public void setImage(RecipeImage image) {
+        this.image = image;
     }
 
     public Integer getPrep_time_in_min() {
