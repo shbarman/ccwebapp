@@ -29,6 +29,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter
                 .authorizeRequests()
                 .antMatchers("/v1/user").permitAll()
                 .antMatchers(HttpMethod.GET,"/v1/recipie/{id}").permitAll()
+                .antMatchers(HttpMethod.GET,"/v1/recipie/{idRecipe}/image/{idImage}").permitAll()
                 .anyRequest().authenticated()
                 .and()
                 .httpBasic()
@@ -42,6 +43,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter
     {
         authentication.userDetailsService(userDetailsService).passwordEncoder(passwordEncoder());
     }
+
+
 
 
 

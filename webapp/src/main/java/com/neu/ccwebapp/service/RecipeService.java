@@ -52,6 +52,8 @@ public class RecipeService {
         }
 
 
+
+
     }
 
     public void deleteByRecipesAuthorId(UUID recipeAuthorId)
@@ -87,6 +89,11 @@ public class RecipeService {
         recipeRepository.saveAndFlush(recFound);
         //recipeRepository.save(recFound);
         }
+
+    public boolean isRecipeImagePresent(Optional<Recipe> recipe) {
+        if(recipe.get().getImage() == null) return false;
+        return true;
+    }
     }
 
 

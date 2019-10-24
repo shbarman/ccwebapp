@@ -99,6 +99,8 @@ public class RecipeController {
         if (recipeService.findById(id).isPresent()) {
 
             Optional<Recipe> recipefound = recipeService.findById(id);
+
+
             UUID rec = recipefound.get().getAuthorid();
             if (rec.equals(u.getUserID())) {
                 System.out.println("Equal");
