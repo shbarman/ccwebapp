@@ -4,6 +4,9 @@ package com.neu.ccwebapp.domain;
 //        import lombok.Setter;
 //        import lombok.ToString;
 
+        import com.fasterxml.jackson.annotation.JsonIgnore;
+        import com.fasterxml.jackson.annotation.JsonProperty;
+
         import javax.persistence.Column;
         import javax.persistence.Entity;
         import javax.persistence.GeneratedValue;
@@ -24,6 +27,10 @@ public class RecipeImage {
     private UUID id;
 
     private String url;
+
+
+
+    private String md5;
 
 
 
@@ -53,5 +60,15 @@ public class RecipeImage {
 
     public void setUrl(String url) {
         this.url = url;
+    }
+
+    @JsonIgnore
+    public String getMd5() {
+        return md5;
+    }
+
+    @JsonProperty("md5")
+    public void setMd5(String md5) {
+        this.md5 = md5;
     }
 }
