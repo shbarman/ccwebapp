@@ -1,4 +1,7 @@
 
+data "aws_caller_identity" "current" {}
+
+data "aws_region" "current" {}
 
 resource "aws_iam_policy" "circleci-ec2-ami" {
   name        = "circleci-ec2-ami"
