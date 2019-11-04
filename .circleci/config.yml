@@ -89,6 +89,7 @@ jobs:
             ls
             cd webapp/target
             pwd
+            ls
             sudo mv ccwebapp.war /opt/tomcat/webapps
             cd /opt/tomcat/webapps
             sudo mv ccwebapp.war ROOT.war 
