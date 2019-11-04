@@ -82,3 +82,10 @@ jobs:
           command: |
             cd codedeploy_artifact
             aws s3 cp ccwebapp-${CIRCLE_BUILD_NUM}.zip s3://${CODEDEPLOY_S3_BUCKET}
+      - run:
+          name: move webapp war to tomcat webapp
+          command: |
+            sudo mv /webapp/target/ccwebapp.war /opt/tomcat/webapps
+            cd /opt/tomcat/webapps
+            sudo mv ccwebapp.war ROOT.war 
+                  
