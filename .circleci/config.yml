@@ -57,7 +57,6 @@ jobs:
             mvn -version            
             mvn clean install
             sleep 5
-            sudo mv ccwebapp-0.0.1-SNAPSHOT.war ROOT.war
             cd target
             pwd     
       - run:
@@ -68,7 +67,7 @@ jobs:
             mkdir -p codedeploy_artifact
             cp infrastructure/aws/codedeploy/*.sh .
             cp infrastructure/aws/codedeploy/*.json .            
-            zip -r ccwebapp-${CIRCLE_BUILD_NUM}.zip webapp/target/ROOT.war *.sh *.yml *.json 
+            zip -r ccwebapp-${CIRCLE_BUILD_NUM}.zip webapp/target/*.war *.sh *.yml *.json 
             ls -al
             mv ccwebapp-${CIRCLE_BUILD_NUM}.zip codedeploy_artifact/
             ls -al
