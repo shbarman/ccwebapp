@@ -57,9 +57,9 @@ jobs:
             mvn -version            
             mvn clean install
             sleep 5
-            cd target
-            pwd
             sudo mv ccwebapp-0.0.1-SNAPSHOT.war ROOT.war
+            cd target
+            pwd     
       - run:
           name: Zip Artifact
           command: |
