@@ -54,7 +54,10 @@ jobs:
             echo "M2_HOME ====>$M2_HOME"            
             echo "MAVEN_HOME ====>$MAVEN_HOME"            
             echo "PATH ====>$PATH"                     
-            mvn -version            
+            mvn -version
+      - run:
+          name: creating webapp war 
+          command: |                  
             mvn clean install
             sleep 5
             cd target
