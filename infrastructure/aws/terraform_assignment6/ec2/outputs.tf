@@ -16,3 +16,5 @@ output "subnet1_id_from_vpc" {
 output "vpcId" {
    value = var.VPC_ID
 }
+
+ 

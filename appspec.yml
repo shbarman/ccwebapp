@@ -7,7 +7,7 @@
 
  hooks:
    BeforeInstall:
-    - location: ./codedeploy/beforeInstall.sh
+    - location: 
       timeout: 180
       runas: centos
    AfterInstall:

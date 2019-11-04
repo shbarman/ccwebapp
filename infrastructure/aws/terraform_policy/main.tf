@@ -137,6 +137,13 @@ EOF
 }
 
 
+resource "aws_iam_role_policy_attachment" "EC2ServiceRole_cloudwatch_policy_attach" {
+  role       = "${aws_iam_role.EC2ServiceRole.name}"
+  depends_on = [aws_iam_role.EC2ServiceRole]
+  policy_arn = "arn:aws:iam::aws:policy/CloudWatchAgentServerPolicy"
+}
+
+
 
 resource "aws_iam_role_policy_attachment" "EC2ServiceRole_codeDeploy_policy_attach" {
   role       = "${aws_iam_role.EC2ServiceRole.name}"

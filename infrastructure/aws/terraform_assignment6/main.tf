@@ -17,7 +17,6 @@ variable "bucketName"{
 	description = "Enter Bucket Name like dev.bhfatnani.me"
 	type=string
 }
-
 variable "EC2ServiceRoleName"{
 	description = "Enter EC2ServiceRoleName"
 	type=string
@@ -30,5 +29,3 @@ module "ec2" {
     bucketName=var.bucketName
     EC2ServiceRoleName=var.EC2ServiceRoleName
 }
-
-
