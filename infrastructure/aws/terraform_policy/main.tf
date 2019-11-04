@@ -1,3 +1,7 @@
+variable "code_deploy_name"{
+  description="ENTER NAME FOR CODE DEPLOY LIKE codedeploy.csyeshbarman.me"
+  type=string
+}
 
 data "aws_caller_identity" "current" {}
 
@@ -62,12 +66,9 @@ resource "aws_iam_policy" "CodeDeploy-EC2-S3" {
     "Version": "2012-10-17",
     "Statement": [
         {
-            "Action": [
-                "s3:Get*",
-                "s3:List*"
-            ],
+            "Action": ["s3:PutObject", "s3:GetObject", "s3:DeleteObject","s3:GetObjectAcl", "s3:GetObjectVersionAcl", "s3:ListBucket","s3:ListAllMyBuckets"],
             "Effect": "Allow",
-            "Resource": ["arn:aws:s3:::codedeploy.harshithasomasundar.me"]
+            "Resource": ["arn:aws:s3:::${var.code_deploy_name}"]
         }
     ]
 }
@@ -84,10 +85,8 @@ resource "aws_iam_policy" "CircleCI-Upload-To-S3" {
     "Statement": [
         {
             "Effect": "Allow",
-            "Action": [
-                "s3:PutObject"
-            ],
-            "Resource": ["arn:aws:s3:::codedeploy.harshithasomasundar.me"]
+            "Action": ["s3:PutObject", "s3:GetObject", "s3:DeleteObject","s3:GetObjectAcl", "s3:GetObjectVersionAcl", "s3:ListBucket","s3:ListAllMyBuckets"],
+            "Resource": ["arn:aws:s3:::${var.code_deploy_name}"]
         }
     ]
 }
