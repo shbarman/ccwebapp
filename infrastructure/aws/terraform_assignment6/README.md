@@ -30,7 +30,7 @@ terraform destroy
 2. terraform init -> tells Terraform to scan the code and read the providers to be downloaded for the execution
 3. terraform plan -> to perform a refresh and create an execution plan
 4. terraform apply -> to create the required cidr blocks/vpcs and subnets
-5. terraform destroy -> destroys the mentioned vpc or subnet block
+5. terraform destroy -> destroys the mentioned vpc or subnet block basically our plan which we applied using terraform apply
 6. For updated terraform rds_instance 
         The rds_instance ingress rule allows the security group set in the webapp application
         ingress {
