@@ -38,8 +38,8 @@ jobs:
           name: Installing Maven 3.6
           command: |
             wget https://www-us.apache.org/dist/maven/maven-3/3.6.2/binaries/apache-maven-3.6.2-bin.zip
-            sudo unzip apache-maven-3.2.3-bin.zip
-            sudo mv apache-maven-3.2.3/ /opt/maven
+            sudo unzip apache-maven-3.6.2-bin.zip
+            sudo mv apache-maven-3.6.2/ /opt/maven
             sudo ln -s /opt/maven/bin/mvn /usr/bin/mvn
             sudo vi /etc/profile.d/maven.sh
 
