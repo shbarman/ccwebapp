@@ -85,7 +85,7 @@ resource "aws_iam_policy" "CircleCI-Upload-To-S3" {
     "Statement": [
         {
             "Effect": "Allow",
-            "Action": ["s3:PutObject", "s3:GetObject", "s3:DeleteObject","s3:GetObjectAcl", "s3:GetObjectVersionAcl", "s3:ListBucket","s3:ListAllMyBuckets"],
+            "Action": ["s3:PutObject","s3:GetObject", "s3:DeleteObject","s3:GetObjectAcl", "s3:GetObjectVersionAcl", "s3:ListBucket","s3:ListAllMyBuckets"],
             "Resource": ["arn:aws:s3:::${var.code_deploy_name}/*"]
         }
     ]
@@ -204,7 +204,7 @@ resource "aws_iam_policy" "CircleCI-Code-Deploy" {
       "Effect": "Allow",
       "Action": [
         "codedeploy:RegisterApplicationRevision",
-        "codedeploy:GetApplicationRevision"
+        "codedeploy:GetApplicationRevision",
         "codedeploy:ListApplicationRevision"
       ],
       "Resource": [
