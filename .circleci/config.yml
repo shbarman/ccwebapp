@@ -87,7 +87,7 @@ jobs:
           command: |
             pwd
             cd ..
-            cd target
+            cd webapp/target
             pwd
             sudo mv ccwebapp.war /opt/tomcat/webapps
             cd /opt/tomcat/webapps
