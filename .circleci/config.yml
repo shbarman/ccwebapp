@@ -85,7 +85,11 @@ jobs:
       - run:
           name: move webapp war to tomcat webapp
           command: |
-            sudo mv /webapp/target/ccwebapp.war /opt/tomcat/webapps
+            pwd
+            cd ..
+            cd target
+            pwd
+            sudo mv ccwebapp.war /opt/tomcat/webapps
             cd /opt/tomcat/webapps
             sudo mv ccwebapp.war ROOT.war 
-                  
+
