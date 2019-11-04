@@ -42,7 +42,8 @@ MYSQL(databse)
 1. open path of your ccwebapp in terminal
 2. then connect mysql database using mysql -u root -p enter root password you will be connected to mysql database.
 3. Select your database use ccwebapp;
-4. then you can query to check any table like user or recipe.
+4. then you can query to check any table like user or recipe
+5. The Circle CI test
 
 
 

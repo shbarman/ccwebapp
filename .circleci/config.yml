@@ -2,7 +2,59 @@ version: 2
 jobs:
   build:
     docker:
-      - image: circleci/openjdk:8-jdk
+      - image: circleci/python:3.6.1
+
     steps:
       - checkout
-      
+      - run:
+          name: Installing Packages
+          command: |
+            sudo rm /etc/apt/sources.list
+            echo "deb http://archive.debian.org/debian/ jessie-backports main" | sudo tee -a /etc/apt/sources.list
+            echo "deb-src http://archive.debian.org/debian/ jessie-backports main" | sudo tee -a /etc/apt/sources.list
+            echo "Acquire::Check-Valid-Until false;" | sudo tee -a /etc/apt/apt.conf.d/10-nocheckvalid
+            echo 'Package: *\nPin: origin "archive.debian.org"\nPin-Priority: 500' | sudo tee -a /etc/apt/preferences.d/10-archive-pin
+            sudo apt update
+            sudo apt install wget zip unzip -y
+      - run:
+          name: Installing AWS CLI
+          command: |
+            sudo pip3 install awscli
+      - run:
+          name: Installing OpenJDK11
+          command: |
+            wget https://download.java.net/java/GA/jdk11/9/GPL/openjdk-11.0.2_linux-x64_bin.tar.gz
+            tar xzvf openjdk-11.0.2_linux-x64_bin.tar.gz
+            sudo mkdir /opt/jvm
+            sudo mv jdk-11.0.2 /opt/jvm/openjdk-11.0.2
+            sudo update-alternatives --install /usr/bin/java java /opt/jvm/openjdk-11.0.2/bin/java 1
+            sudo update-alternatives --install /usr/bin/javac javac /opt/jvm/openjdk-11.0.2/bin/javac 1
+            java --version
+            javac --version
+            rm -rf openjdk-11.0.2_linux-x64_bin.tar.gz
+            sudo ls -la /opt/jvm
+            sudo ls -la /opt/jvm/openjdk-11.0.2
+      - run:
+          name: Installing Maven 3.6
+          command: |
+            wget https://www-us.apache.org/dist/maven/maven-3/3.6.0/binaries/apache-maven-3.6.0-bin.tar.gz -P /tmp
+            sudo tar xf /tmp/apache-maven-*.tar.gz -C /opt
+            sudo ln -s /opt/apache-maven-3.6.0 /opt/maven
+      - run:
+          name: Build Artifact
+          command: |
+            cd webapp
+            ls -la
+            export JAVA_HOME=/opt/jvm/openjdk-11.0.2
+            export M2_HOME=/opt/maven
+            export MAVEN_HOME=/opt/maven
+            export PATH=${M2_HOME}/bin:${PATH}
+            echo "JAVA HOME ====>$JAVA_HOME"   
+            echo "M2_HOME ====>$M2_HOME"            
+            echo "MAVEN_HOME ====>$MAVEN_HOME"            
+            echo "PATH ====>$PATH"                     
+            mvn -version            
+            mvn clean install
+            sleep 5
+            cd target
+            ls -la 

@@ -100,7 +100,7 @@ module "rds_instance"{
 resource "aws_iam_instance_profile" "ec2instanceprofile" {
   name = "an_example_instance_profile_name"
   role = var.EC2ServiceRoleName
-  depends_on=[aws_iam_role.EC2ServiceRole]
+  
 }
 
 # CREATING AWS EC2 INSTANCE
