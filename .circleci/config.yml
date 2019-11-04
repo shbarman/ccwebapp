@@ -41,7 +41,7 @@ jobs:
             sudo unzip apache-maven-3.6.2-bin.zip
             sudo mv apache-maven-3.6.2/ /opt/maven
             sudo ln -s /opt/maven/bin/mvn /usr/bin/mvn
-            sudo vi /etc/profile.d/maven.sh
+            
 
       - run:
           name: Build Artifact
