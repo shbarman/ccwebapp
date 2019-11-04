@@ -66,26 +66,27 @@ resource "aws_iam_policy" "CodeDeploy-EC2-S3" {
     "Version": "2012-10-17",
     "Statement": [
         {
-            "Action": ["s3:PutObject", "s3:PutObjectAcl", "s3:GetObject", "s3:DeleteObject","s3:GetObjectAcl", "s3:GetObjectVersionAcl", "s3:ListBucket","s3:ListAllMyBuckets","s3:List*"],
+            "Action": ["s3:PutObject", "s3:GetObject", "s3:DeleteObject","s3:GetObjectAcl", "s3:GetObjectVersionAcl", "s3:ListBucket","s3:ListAllMyBuckets"],
             "Effect": "Allow",
-            "Resource": ["arn:aws:s3:::${var.code_deploy_name}"]
+            "Resource": ["arn:aws:s3:::${var.code_deploy_name}/*"]
         }
     ]
 }
 EOF
 }
- 
+
 resource "aws_iam_policy" "CircleCI-Upload-To-S3" {
   name        = "CircleCI-Upload-To-S3"
   description = "A Upload policy"
+
   policy = <<EOF
 {
     "Version": "2012-10-17",
     "Statement": [
         {
             "Effect": "Allow",
-            "Action": ["s3:PutObject", "s3:PutObjectAcl","s3:GetObject", "s3:DeleteObject","s3:GetObjectAcl", "s3:GetObjectVersionAcl", "s3:ListBucket","s3:ListAllMyBuckets","s3:List*"],
-            "Resource": ["arn:aws:s3:::${var.code_deploy_name}"]
+            "Action": ["s3:PutObject", "s3:GetObject", "s3:DeleteObject","s3:GetObjectAcl", "s3:GetObjectVersionAcl", "s3:ListBucket","s3:ListAllMyBuckets"],
+            "Resource": ["arn:aws:s3:::${var.code_deploy_name}/*"]
         }
     ]
 }
@@ -204,6 +205,7 @@ resource "aws_iam_policy" "CircleCI-Code-Deploy" {
       "Action": [
         "codedeploy:RegisterApplicationRevision",
         "codedeploy:GetApplicationRevision"
+        "codedeploy:ListApplicationRevision"
       ],
       "Resource": [
         "arn:aws:codedeploy:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:application:${aws_codedeploy_app.csye6225-webapp.name}"
