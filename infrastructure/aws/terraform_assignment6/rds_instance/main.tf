@@ -58,3 +58,4 @@ resource "aws_dynamodb_table" "csye6225" {
   
 }
 
+
