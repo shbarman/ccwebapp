@@ -37,9 +37,12 @@ jobs:
       - run:
           name: Installing Maven 3.6
           command: |
-            wget https://www-us.apache.org/dist/maven/maven-3/3.6.2/binaries/apache-maven-3.6.2-bin.tar.gz -P /tmp
-            sudo tar xf /tmp/apache-maven-*.tar.gz -C /opt
-            sudo ln -s /opt/apache-maven-3.6.0 /opt/maven
+            wget http://www.eng.lsu.edu/mirrors/apache/maven/maven-3/3.2.3/binaries/apache-maven-3.2.3-bin.zip
+            sudo unzip apache-maven-3.2.3-bin.zip
+            sudo mv apache-maven-3.2.3/ /opt/maven
+            sudo ln -s /opt/maven/bin/mvn /usr/bin/mvn
+            sudo vi /etc/profile.d/maven.sh
+
       - run:
           name: Build Artifact
           command: |
@@ -48,7 +51,7 @@ jobs:
             export JAVA_HOME=/opt/jvm/openjdk-11.0.2
             export M2_HOME=/opt/maven
             export MAVEN_HOME=/opt/maven
-            export PATH=${M2_HOME}/bin:${PATH}
+            export PATH=${MAVEN_HOME}/bin:${PATH}
             echo "JAVA HOME ====>$JAVA_HOME"   
             echo "M2_HOME ====>$M2_HOME"            
             echo "MAVEN_HOME ====>$MAVEN_HOME"            
