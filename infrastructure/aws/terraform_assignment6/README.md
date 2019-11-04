@@ -8,7 +8,7 @@ Download Terraform single binary file from the below link
 
 ## Setup
 
-For User to able to make changes to your AWS account AWS_PROFILE should be set for IAM user as environment variables by the following commands
+For User to able to make changes to your AWS account AWS_PROFILE should be set for IAM user as environment variables by the following commands:
 
 ```bash
 export AWS_ACCESS_KEY =(your access key)
