@@ -1,3 +1,2 @@
 #!/bin/bash -xe
-cd /opt/tomcat/bin
-sudo ./startup.sh
+sudo systemctl start tomcat.service
