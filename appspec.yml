@@ -6,10 +6,18 @@
      destination: /opt/tomcat/webapps
 
  hooks:
-   BeforeInstall:
-    - location: 
+   BeforeInstall: 
+    - location: ./codedeploy/beforeInstall.sh
       timeout: 180
       runas: centos
+   ApplicationStart:
+    - location: ./codedeploy/applicationstart.sh
+      timeout: 180
+      runas: centos
+   ApplicationStop:
+    - location: ./codedeploy/applicationstop.sh
+      timeout: 180
+      runas: centos 
    AfterInstall:
     - location: ./codedeploy/afterInstall.sh
       timeout: 180
