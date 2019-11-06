@@ -11,16 +11,16 @@
    BeforeInstall: 
     - location: infrastructure/aws/codedeploy/beforeInstall.sh
       timeout: 180
-      runas: centos
+      runas: root
    ApplicationStart:
     - location: infrastructure/aws/codedeploy/applicationstart.sh
       timeout: 180
-      runas: centos
+      runas: root
    ApplicationStop:
     - location: infrastructure/aws/codedeploy/applicationstop.sh
       timeout: 180
-      runas: centos 
+      runas: root
    AfterInstall:
     - location: infrastructure/aws/codedeploy/afterInstall.sh
       timeout: 180
-      runas: centos
+      runas: root
