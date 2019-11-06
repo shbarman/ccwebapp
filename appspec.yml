@@ -8,19 +8,19 @@
     destination: /opt
 
  hooks:
-   BeforeInstall: 
-    - location: infrastructure/aws/codedeploy/beforeInstall.sh
-      timeout: 180
-      runas: root
-   ApplicationStart:
-    - location: infrastructure/aws/codedeploy/applicationstart.sh
-      timeout: 180
-      runas: root
-   ApplicationStop:
+ ApplicationStop:
     - location: infrastructure/aws/codedeploy/applicationstop.sh
       timeout: 180
-      runas: root
-   AfterInstall:
+      runas: centos
+ BeforeInstall: 
+    - location: infrastructure/aws/codedeploy/beforeInstall.sh
+      timeout: 180
+      runas: centos
+ AfterInstall:
     - location: infrastructure/aws/codedeploy/afterInstall.sh
       timeout: 180
-      runas: root
+      runas: centos
+ ApplicationStart:
+    - location: infrastructure/aws/codedeploy/applicationstart.sh
+      timeout: 180
+      runas: centos
