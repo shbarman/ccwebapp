@@ -64,7 +64,7 @@ jobs:
           command: |
            pwd
             ls -al
-            mv webapp/target/ccwebapp.war webapp/target/ROOT.war
+            #mv webapp/target/ccwebapp.war webapp/target/ROOT.war
             mkdir -p codedeploy_artifact
             cp infrastructure/aws/codedeploy/*.sh .
             cp infrastructure/aws/codedeploy/*.json .
