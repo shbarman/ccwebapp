@@ -69,7 +69,7 @@ resource "aws_iam_policy" "CodeDeploy-EC2-S3" {
             "Action": ["s3:List*",
                         "s3:Get*"],
             "Effect": "Allow",
-            "Resource": ["arn:aws:s3:::${var.code_deploy_name}/", "arn:aws:s3:::aws-codedeploy-us-east-2/",
+            "Resource": ["arn:aws:s3:::${var.code_deploy_name}/*", "arn:aws:s3:::aws-codedeploy-us-east-2/*",
               "arn:aws:s3:::aws-codedeploy-us-east-1/*"]
         }
     ]
@@ -186,7 +186,7 @@ EOF
 resource "aws_iam_role_policy_attachment" "CodeDeployServiceRole_codeDeploy_policy_attach" {
   role       = "${aws_iam_role.CodeDeployServiceRole.name}"
   depends_on = [aws_iam_role.CodeDeployServiceRole]
-  policy_arn = "${aws_iam_policy.CodeDeploy-EC2-S3.arn}"
+  policy_arn = "arn:aws:iam::aws:policy/service-role/AWSCodeDeployRole"
 }
 
 resource "aws_codedeploy_app" "csye6225-webapp" {
