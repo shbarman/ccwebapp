@@ -100,11 +100,6 @@
 		</dependency>
 
 
-
-		<dependency>
-			<groupId>com.amazonaws</groupId>
-			<artifactId>aws-java-sdk-sns</artifactId>
-		</dependency>
         <dependency>
             <groupId>org.junit.jupiter</groupId>
         <artifactId>junit-jupiter</artifactId>
@@ -131,7 +126,7 @@
 
 			 <configuration>
           <includes>
-            <include>/test/java/com/neu/ccwebapp/CcwebappApplicationTests.java</include>
+            <include>/test/java/com/neu/ccwebapp.*</include>
           </includes>
         </configuration>
        		 </plugin>
