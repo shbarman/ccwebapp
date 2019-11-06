@@ -37,6 +37,12 @@ public class RecipeController {
     UserRepository userRepository;
 
     @Autowired
+    RecipeImgRepository recipeImgRepository;
+
+    @Autowired
+    RecipeImgService recipeImgService;
+
+    @Autowired
     private StatsDClient statsDClient;
 
     private final static Logger logger = LoggerFactory.getLogger(RecipeController.class);
@@ -161,7 +167,7 @@ public class RecipeController {
 }
 
     @RequestMapping(value = "/v1/recipie/{id}", method = RequestMethod.DELETE)
-    public ResponseEntity<?> deleteRecipeByAuthorId( @PathVariable UUID id,Principal principal) {
+    public ResponseEntity<?> deleteRecipeByAuthorId( @PathVariable UUID id,Principal principal) throws Exception {
 
         statsDClient.incrementCounter("endpoint.v1.recipie.id.api.delete");
 
@@ -174,8 +180,13 @@ public class RecipeController {
 
             if (userLoggedIn.getUserID().equals(recipe.get().getAuthorid())) {
 
+
+                UUID recipeImageID=recipe.get().getImage().getId();
+                Optional<RecipeImage> recipeImage = recipeImgRepository.findById(recipeImageID);
+
                 long startTime =  System.currentTimeMillis();
 
+                recipeImgService.deleteImage(recipeImage,recipe.get().getRecipeId());
                 recipeService.deleteByRecipesAuthorId(recipe.get().getRecipeId());
 
                 long endTime = System.currentTimeMillis();
