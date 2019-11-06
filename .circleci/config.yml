@@ -56,6 +56,7 @@ jobs:
             echo "PATH ====>$PATH"                     
             mvn -version                 
             mvn clean install
+            sleep 5
             mvn test
             sleep 5
             cd target
