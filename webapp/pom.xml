@@ -121,10 +121,7 @@
 				<artifactId>spring-boot-maven-plugin</artifactId>
 			</plugin>
 		</plugins>
-	</build>
-
-	 <build>
-        <finalName>maven-unit-test</finalName>
+		<finalName>maven-unit-test</finalName>
         <plugins>
 		 	<plugin>
             <groupId>org.apache.maven.plugins</groupId>
@@ -133,6 +130,8 @@
        		 </plugin>
 
         </plugins>
-    </build>
+	</build>
+
+	
 
 </project>
