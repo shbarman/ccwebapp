@@ -122,12 +122,18 @@
 				<artifactId>spring-boot-maven-plugin</artifactId>
 			</plugin>
 		
-		
+		 
         
 		 	<plugin>
             <groupId>org.apache.maven.plugins</groupId>
             <artifactId>maven-surefire-plugin</artifactId>
             <version>3.0.0-M3</version>
+
+			 <configuration>
+          <includes>
+            <include>/test/java/com/neu/ccwebapp/CcwebappApplicationTests.java</include>
+          </includes>
+        </configuration>
        		 </plugin>
 
         </plugins>
