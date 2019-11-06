@@ -55,7 +55,7 @@ jobs:
             echo "MAVEN_HOME ====>$MAVEN_HOME"            
             echo "PATH ====>$PATH"                     
             mvn -version                 
-            mvn clean install -X
+            mvn clean install
             sleep 5
             mvn test
             sleep 5
