@@ -9,18 +9,18 @@
 
  hooks:
    BeforeInstall: 
-    - location: ./beforeInstall.sh
+    - location: /beforeInstall.sh
       timeout: 180
       runas: centos
    ApplicationStart:
-    - location: ./applicationstart.sh
+    - location: /applicationstart.sh
       timeout: 180
       runas: centos
    ApplicationStop:
-    - location: ./applicationstop.sh
+    - location: /applicationstop.sh
       timeout: 180
       runas: centos 
    AfterInstall:
-    - location: ./afterInstall.sh
+    - location: /afterInstall.sh
       timeout: 180
       runas: centos
