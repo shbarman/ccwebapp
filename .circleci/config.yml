@@ -57,6 +57,8 @@ jobs:
             mvn -version                 
             mvn clean install
             sleep 5
+            mvn test
+            sleep 5
             cd target
             pwd     
       - run:
@@ -69,7 +71,7 @@ jobs:
             cp infrastructure/aws/codedeploy/*.sh .
             cp infrastructure/aws/codedeploy/*.json .
             cp webapp/target/ROOT.war .            
-            zip -r ccwebapp-${CIRCLE_BUILD_NUM}.zip *.war *.sh *.yml *.json 
+            zip -r ccwebapp-${CIRCLE_BUILD_NUM}.zip webapp/target/ROOT.war *.sh *.yml *.json 
             ls -al
             mv ccwebapp-${CIRCLE_BUILD_NUM}.zip codedeploy_artifact/
             ls -al

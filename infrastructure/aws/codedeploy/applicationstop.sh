@@ -1,3 +1,2 @@
 #!/bin/bash -xe
-cd /opt/tomcat/bin
-sudo ./shutdown.sh
+sudo /opt/tomcat/bin/./shutdown.sh
