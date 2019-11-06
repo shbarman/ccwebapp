@@ -2,7 +2,7 @@
  os: linux
 
  files:             
-  - source: ./ROOT.war
+  - source: ROOT.war
     destination: /opt/tomcat/webapps
   - source: cloudwatch-config.json
     destination: /opt
