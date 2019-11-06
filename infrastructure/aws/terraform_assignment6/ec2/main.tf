@@ -107,6 +107,7 @@ module "rds_instance"{
 
 resource "aws_iam_instance_profile" "ec2instanceprofile" {
   name = "an_example_instance_profile_name"
+  depends_on = [aws_iam_role_policy_attachment.EC2ServiceRole_CRUD_policy_attach]
   role = var.EC2ServiceRoleName
 }
 

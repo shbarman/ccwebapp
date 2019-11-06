@@ -195,6 +195,7 @@ resource "aws_codedeploy_app" "csye6225-webapp" {
 resource "aws_iam_policy" "CircleCI-Code-Deploy" {
   name        = "CircleCI-Code-Deploy"
   description = "A Upload policy"
+  depends_on = [aws_codedeploy_deployment_group.csye6225-webapp-deployment, aws_codedeploy_app.csye6225-webapp]
 
   policy = <<EOF
 {

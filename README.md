@@ -6,7 +6,7 @@
 | --- | --- | --- |
 | Harshitha Somasundar |001497986 | somasundar.h@husky.neu.edu |
 | Shuravi Barman | 001475070 | barman.s@husky.neu.edu |
-| Bhashmi dineshbai Fatnani |  001449268 |  fatnani.b@husky.neu.edu|
+| Bhashmi Dineshbhai Fatnani |  001449268 |  fatnani.b@husky.neu.edu|
 | | | |
 
 ## Technology Stack

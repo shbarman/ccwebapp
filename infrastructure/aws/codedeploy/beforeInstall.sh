@@ -1,4 +1,3 @@
-#!/bin/bash
-cd /opt/tomcat/bin
-sudo ./startup.sh
-sudo ./shutdown.sh
+#!/bin/bash -xe
+sudo systemctl start tomcat.service
+sudo systemctl stop tomcat.service
