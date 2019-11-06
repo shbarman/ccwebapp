@@ -66,9 +66,11 @@ resource "aws_iam_policy" "CodeDeploy-EC2-S3" {
     "Version": "2012-10-17",
     "Statement": [
         {
-            "Action": ["s3:PutObject", "s3:GetObject", "s3:DeleteObject","s3:GetObjectAcl", "s3:GetObjectVersionAcl", "s3:ListBucket","s3:ListAllMyBuckets"],
+            "Action": ["s3:List*",
+                        "s3:Get*"],
             "Effect": "Allow",
-            "Resource": ["arn:aws:s3:::${var.code_deploy_name}/*"]
+            "Resource": ["arn:aws:s3:::${var.code_deploy_name}/", "arn:aws:s3:::aws-codedeploy-us-east-2/",
+              "arn:aws:s3:::aws-codedeploy-us-east-1/*"]
         }
     ]
 }
@@ -219,7 +221,7 @@ resource "aws_iam_policy" "CircleCI-Code-Deploy" {
         "codedeploy:GetDeployment"
       ],
       "Resource": [
-        "*"
+        "arn:aws:codedeploy:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:deploymentgroup:${aws_codedeploy_app.csye6225-webapp.name}/${aws_codedeploy_deployment_group.csye6225-webapp-deployment.deployment_group_name}"
       ]
     },
     {
