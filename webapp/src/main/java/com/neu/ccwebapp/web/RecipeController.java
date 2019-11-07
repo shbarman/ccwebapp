@@ -183,9 +183,13 @@ public class RecipeController {
 
             if (userLoggedIn.getUserID().equals(recipe.get().getAuthorid())) {
 
+                if(recipe.get().getImage()!=null){
 
-                UUID recipeImageID=recipe.get().getImage().getId();
-                Optional<RecipeImage> recipeImage = recipeImgRepository.findById(recipeImageID);
+                    UUID recipeImageID=recipe.get().getImage().getId();
+                    Optional<RecipeImage> recipeImage = recipeImgRepository.findById(recipeImageID);
+                    recipeImgService.deleteImage(recipeImage,recipe.get().getRecipeId());
+                }
+
 
                 long startTime =  System.currentTimeMillis();
 
