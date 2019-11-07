@@ -176,7 +176,7 @@ public class RecipeController {
 
         String username = principal.getName();
         User userLoggedIn = userRepository.findByUsername(username);
-
+    logger.info("Deleting recipe");
         if (recipeService.findById(id).isPresent()) {
 
             Optional<Recipe> recipe = recipeService.findById(id);
@@ -193,7 +193,7 @@ public class RecipeController {
 
                 long startTime =  System.currentTimeMillis();
 
-                recipeImgService.deleteImage(recipeImage,recipe.get().getRecipeId());
+
                 recipeService.deleteByRecipesAuthorId(recipe.get().getRecipeId());
 
                 long endTime = System.currentTimeMillis();
