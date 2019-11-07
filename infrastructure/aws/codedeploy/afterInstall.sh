@@ -1,6 +1,5 @@
-#!/bin/bash
-cd /opt/tomcat/bin
-sudo ./shutdown.sh
+#!/bin/bash -xe
+sudo /opt/tomcat/bin/./shutdown.sh
 
 # cleanup log files
 sudo rm -rf /opt/tomcat/logs/catalina*

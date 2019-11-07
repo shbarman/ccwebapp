@@ -41,7 +41,7 @@ MYSQL(databse)
 1. CircleCI is used th deploy the webapp code
 2. Use the api : " curl -u <PERSONAL_OR_PROJECT_TOKEN> \
                       -d build_parameters[CIRCLE_JOB]=build \
-                      https://circleci.com/api/v1.1/project/github/tejasparikh/csye6225-spring2019-ami/tree/master"  to trigger the CircleCI job                  
+                      https://circleci.com/api/v1.1/project/github/tejasparikh/csye6225-spring2019-ami/tree/master"  to trigger the CircleCI job without git commit             
 3. the job consists of environment variables like AWS acesskeys, bucket name and region , also the RDS instance which the the database for webapp
 
 

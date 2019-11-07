@@ -1,3 +1,3 @@
 #!/bin/bash -xe
-cd /opt/tomcat/bin
-sudo ./startup.sh
+sudo /opt/tomcat/bin/./startup.sh
+sudo systemctl start amazon-cloudwatch-agent.service

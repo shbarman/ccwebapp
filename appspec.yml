@@ -2,23 +2,23 @@
  os: linux
 
  files:             
-   - source: ./webapp/build/libs/ROOT.war
-     destination: /opt/tomcat/webapps
+  - source: ./webapp/target/ROOT.war
+    destination: /opt/tomcat/webapps
 
  hooks:
-   BeforeInstall: 
-    - location: ./codedeploy/beforeInstall.sh
+ ApplicationStop:
+    - location: ./applicationstop.sh
       timeout: 180
       runas: centos
-   ApplicationStart:
-    - location: ./codedeploy/applicationstart.sh
+ BeforeInstall: 
+    - location: ./beforeInstall.sh
       timeout: 180
       runas: centos
-   ApplicationStop:
-    - location: ./codedeploy/applicationstop.sh
+ AfterInstall:
+    - location: ./afterInstall.sh
       timeout: 180
-      runas: centos 
-   AfterInstall:
-    - location: ./codedeploy/afterInstall.sh
+      runas: centos
+ ApplicationStart:
+    - location: ./applicationstart.sh
       timeout: 180
       runas: centos

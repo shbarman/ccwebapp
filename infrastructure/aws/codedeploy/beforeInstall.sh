@@ -1,4 +1,3 @@
-#!/bin/bash
-cd /opt/tomcat/bin
-sudo ./startup.sh
-sudo ./shutdown.sh
+#!/bin/bash -xe
+sudo /opt/tomcat/bin/./startup.sh
+sudo /opt/tomcat/bin/./shutdown.sh
