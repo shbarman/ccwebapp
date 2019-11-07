@@ -2,7 +2,100 @@ version: 2
 jobs:
   build:
     docker:
-      - image: circleci/openjdk:8-jdk
+      - image: circleci/python:3.6.1
+
     steps:
       - checkout
-      
+      - run:
+          name: Installing Packages
+          command: |
+            sudo rm /etc/apt/sources.list
+            echo "deb http://archive.debian.org/debian/ jessie-backports main" | sudo tee -a /etc/apt/sources.list
+            echo "deb-src http://archive.debian.org/debian/ jessie-backports main" | sudo tee -a /etc/apt/sources.list
+            echo "Acquire::Check-Valid-Until false;" | sudo tee -a /etc/apt/apt.conf.d/10-nocheckvalid
+            echo 'Package: *\nPin: origin "archive.debian.org"\nPin-Priority: 500' | sudo tee -a /etc/apt/preferences.d/10-archive-pin
+            sudo apt update
+            sudo apt install wget zip unzip -y
+      - run:
+          name: Installing AWS CLI
+          command: |
+            sudo pip3 install awscli
+      - run:
+          name: Installing OpenJDK11
+          command: |
+            wget https://download.java.net/java/GA/jdk11/9/GPL/openjdk-11.0.2_linux-x64_bin.tar.gz
+            tar xzvf openjdk-11.0.2_linux-x64_bin.tar.gz
+            sudo mkdir /opt/jvm
+            sudo mv jdk-11.0.2 /opt/jvm/openjdk-11.0.2
+            sudo update-alternatives --install /usr/bin/java java /opt/jvm/openjdk-11.0.2/bin/java 1
+            sudo update-alternatives --install /usr/bin/javac javac /opt/jvm/openjdk-11.0.2/bin/javac 1
+            java --version
+            javac --version
+            rm -rf openjdk-11.0.2_linux-x64_bin.tar.gz
+            sudo ls -la /opt/jvm
+            sudo ls -la /opt/jvm/openjdk-11.0.2
+      - run:
+          name: Installing Maven 3.6
+          command: |
+            wget https://www-us.apache.org/dist/maven/maven-3/3.6.2/binaries/apache-maven-3.6.2-bin.zip
+            sudo unzip apache-maven-3.6.2-bin.zip
+            sudo mv apache-maven-3.6.2/ /opt/maven
+            sudo ln -s /opt/maven/bin/mvn /usr/bin/mvn
+      - run:
+          name: Build Artifact
+          command: |
+            cd webapp
+            ls -la
+            export JAVA_HOME=/opt/jvm/openjdk-11.0.2
+            export M2_HOME=/opt/maven
+            export MAVEN_HOME=/opt/maven
+            export PATH=${MAVEN_HOME}/bin:${PATH}
+            echo "JAVA HOME ====>$JAVA_HOME"   
+            echo "M2_HOME ====>$M2_HOME"            
+            echo "MAVEN_HOME ====>$MAVEN_HOME"            
+            echo "PATH ====>$PATH"                     
+            mvn -version            
+            mvn clean install
+            sleep 5
+            cd target
+      - run:
+          name: Zip Artifact
+          command: |
+           pwd
+            ls -al
+            mkdir -p codedeploy_artifact
+            cp infrastructure/aws/codedeploy/*.sh .
+            cp infrastructure/aws/codedeploy/*.json .            
+            zip -r ccwebapp-${CIRCLE_BUILD_NUM}.zip webapp/target/ROOT.war *.sh *.yml *.json 
+            ls -al
+            mv ccwebapp-${CIRCLE_BUILD_NUM}.zip codedeploy_artifact/
+            ls -al
+            pwd
+            cd codedeploy_artifact
+            ls -al
+            pwd
+            cd ..
+            pwd
+            ls -al
+      - run:
+          name: Upload Artifact to S3
+          command: |
+            cd codedeploy_artifact
+            aws s3 cp ccwebapp-${CIRCLE_BUILD_NUM}.zip s3://${CODEDEPLOY_S3_BUCKET}
+      - run :
+          name : Make CodeDeploy API call 
+          command : |
+            echo "CodeDeploy"
+            aws deploy register-application-revision --region ${AWS_REGION} --application-name csye6225-webapp \
+            --s3-location bucket=${CODEDEPLOY_S3_BUCKET},key=ccwebapp-${CIRCLE_BUILD_NUM}.zip,bundleType=zip
+            echo "------------------------------------------------------"
+            aws deploy list-application-revisions --region ${AWS_REGION} --application-name csye6225-webapp \
+            --s-3-bucket ${CODEDEPLOY_S3_BUCKET} --deployed exclude
+            echo "------------------------------------------------------"
+            deploymentId=$(aws deploy create-deployment --region ${AWS_REGION} \
+            --application-name csye6225-webapp \
+            --deployment-config-name CodeDeployDefault.AllAtOnce \
+            --deployment-group-name csye6225-webapp-deployment \
+            --s3-location bucket=${CODEDEPLOY_S3_BUCKET},bundleType=zip,key=ccwebapp-${CIRCLE_BUILD_NUM}.zip \
+            --auto-rollback-configuration enabled=true,events=DEPLOYMENT_FAILURE,DEPLOYMENT_STOP_ON_ALARM,DEPLOYMENT_STOP_ON_REQUEST)
+            echo "$deploymentId"      

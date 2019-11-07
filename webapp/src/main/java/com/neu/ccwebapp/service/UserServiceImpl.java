@@ -3,6 +3,10 @@ package com.neu.ccwebapp.service;
 import com.neu.ccwebapp.domain.User;
 import com.neu.ccwebapp.exceptions.UserExistsException;
 import com.neu.ccwebapp.repository.UserRepository;
+import com.neu.ccwebapp.web.AppController;
+import com.timgroup.statsd.StatsDClient;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -33,16 +37,32 @@ public class UserServiceImpl implements UserService, UserDetailsService
     @Autowired
     private PasswordEncoder passwordEncoder;
 
+    @Autowired
+    private StatsDClient statsDClient;
+
+    private final static Logger logger = LoggerFactory.getLogger(UserServiceImpl.class);
+
     @Override
     public User registerUser(User user) throws UserExistsException {
-        System.out.println("inside register");
+
         User existingUser = userRepository.findByUsername(user.getUsername());
         if(existingUser!=null) {
             throw new UserExistsException("A user with username "+user.getUsername() + " already exists");
         }
 
         user.setPassword(passwordEncoder.encode(user.getPassword()));
+        long startTime =  System.currentTimeMillis();
+
         userRepository.save(user);
+        long endTime = System.currentTimeMillis();
+
+        long duration = (endTime - startTime);
+
+        statsDClient.recordExecutionTime("dbQueryTimeUpdateUser",duration);
+
+        logger.info("New User has been added to the DB");
+
+
         return user;
 
     }
@@ -68,14 +88,34 @@ public class UserServiceImpl implements UserService, UserDetailsService
             userLoggedin.setFirst_name(user.getFirst_name());
             userLoggedin.setLast_name(user.getLast_name());
             userLoggedin.setPassword(passwordEncoder.encode(user.getPassword()));
+            long startTime =  System.currentTimeMillis();
+
             userRepository.save(userLoggedin);
+            long endTime = System.currentTimeMillis();
+
+            long duration = (endTime - startTime);
+
+            statsDClient.recordExecutionTime("dbQueryTimeUpdateUser",duration);
+
+            logger.info("User details are updated in the DB");
+
         }
     }
 
     @Override
     public User loadUsername(String userName) {
 
+        long startTime =  System.currentTimeMillis();
+
         User u = userRepository.findByUsername(userName);
+
+        long endTime = System.currentTimeMillis();
+
+        long duration = (endTime - startTime);
+
+        statsDClient.recordExecutionTime("dbQueryTimeGetUser",duration);
+
+      logger.info("Getting user from the DB ");
 
         return u;
     }

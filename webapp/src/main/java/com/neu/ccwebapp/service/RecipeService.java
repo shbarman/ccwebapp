@@ -4,6 +4,9 @@ import com.neu.ccwebapp.domain.Recipe;
 import com.neu.ccwebapp.exceptions.RecipeCreationErrors;
 import com.neu.ccwebapp.exceptions.RecipeDoesNotExistException;
 import com.neu.ccwebapp.repository.RecipeRepository;
+import com.timgroup.statsd.StatsDClient;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -21,9 +24,26 @@ public class RecipeService {
     @Autowired
     RecipeRepository recipeRepository;
 
+    @Autowired
+    private StatsDClient statsDClient;
+
+
+    private final static Logger logger = LoggerFactory.getLogger(RecipeService.class);
+
 
     public Recipe AddRecipe(Recipe recipe){
+
+        long startTime =  System.currentTimeMillis();
+
         recipeRepository.save(recipe);
+        long endTime = System.currentTimeMillis();
+
+        long duration = (endTime - startTime);
+
+        statsDClient.recordExecutionTime("dbQueryTimeCreateRecipe",duration);
+
+        logger.info("New Recipe  has been added to the DB");
+
         return recipe;
     }
 
@@ -46,8 +66,20 @@ public class RecipeService {
     public Optional<Recipe> findById(UUID id) {
 
         try{
-            return recipeRepository.findById(id);
+            long startTime =  System.currentTimeMillis();
+
+            Optional<Recipe> recipe=recipeRepository.findById(id);
+            long endTime = System.currentTimeMillis();
+
+            long duration = (endTime - startTime);
+
+            statsDClient.recordExecutionTime("dbQueryTimeGetRecipe",duration);
+
+            logger.info("Get recipe from DB");
+
+            return recipe;
         }catch(Exception exc) {
+            logger.error("Could not find Recipe by Recipe ID");
             return null;
         }
 
@@ -59,7 +91,17 @@ public class RecipeService {
     public void deleteByRecipesAuthorId(UUID recipeAuthorId)
     {
         Recipe toBeDeletedRecipe = recipeRepository.getOne(recipeAuthorId);
+        long startTime =  System.currentTimeMillis();
+
         recipeRepository.delete(toBeDeletedRecipe);
+        long endTime = System.currentTimeMillis();
+
+        long duration = (endTime - startTime);
+
+        statsDClient.recordExecutionTime("dbQueryTimDeleteRecipe",duration);
+
+        logger.info("Recipe has been deleted from the DB");
+
          ResponseEntity.status(HttpStatus.NO_CONTENT).body("Deleted Recipe");
     }
 
@@ -86,7 +128,17 @@ public class RecipeService {
         //recFound.setSteps(recipe.getSteps());
 
         recFound.setTitle(recipe.getTitle());
+        long startTime =  System.currentTimeMillis();
+
         recipeRepository.saveAndFlush(recFound);
+        long endTime = System.currentTimeMillis();
+
+        long duration = (endTime - startTime);
+
+        statsDClient.recordExecutionTime("dbQueryTimeUpdateRecipe",duration);
+
+        logger.info("Recipe has been updated in the DB");
+
         //recipeRepository.save(recFound);
         }
 

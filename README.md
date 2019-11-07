@@ -6,7 +6,7 @@
 | --- | --- | --- |
 | Harshitha Somasundar |001497986 | somasundar.h@husky.neu.edu |
 | Shuravi Barman | 001475070 | barman.s@husky.neu.edu |
-| Bhashmi dineshbai Fatnani |  001449268 |  fatnani.b@husky.neu.edu|
+| Bhashmi Dineshbhai Fatnani |  001449268 |  fatnani.b@husky.neu.edu|
 | | | |
 
 ## Technology Stack
@@ -20,16 +20,15 @@ hibernate
 MYSQL(databse)
 
 ## Build Instructions
-1. You can run your application from IDE
-2. From terminal you need to run mvn spring-boot:run as maven provides dependency
-3. Also from terminal you can run the application by creating it's jar with command $ java -jar target/myapplication-0.0.1-SNAPSHOT.jar
+1.Run .mvn clean install to build the war.
 
 
 ## Deploy Instructions
-1. To run our API's we have used Postman.
-2. You can run get delete post and put apis
-3. For basic authenction enable authorization hit update request it will be added to headers.
-
+1. Run the Terraform policies, to create policies for IAM circleCI user ,using terraform apply (provide aws region and bucket name)
+2. Run the code deploy to create a custom AMI using CIRCLECI (configure environment variables like AWS keys, bucketname and region)
+3.Run the Terraform to create all the resources required for the instance ( creates EC2, RDS, dynamodb , S3 bucket)
+4.Run this webapp codedeploy using CIRCLECI.
+5. Take the IP created from instance and hot all the POST,GET, DELETE API's
 
 
 ## Running Tests
@@ -39,10 +38,14 @@ MYSQL(databse)
 4. Unit test cases for all api's along with integration testing
 
 ## CI/CD
-1. open path of your ccwebapp in terminal
-2. then connect mysql database using mysql -u root -p enter root password you will be connected to mysql database.
-3. Select your database use ccwebapp;
-4. then you can query to check any table like user or recipe.
+1. CircleCI is used th deploy the webapp code
+2. Use the api : " curl -u <PERSONAL_OR_PROJECT_TOKEN> \
+                      -d build_parameters[CIRCLE_JOB]=build \
+                      https://circleci.com/api/v1.1/project/github/tejasparikh/csye6225-spring2019-ami/tree/master"  to trigger the CircleCI job                  
+3. the job consists of environment variables like AWS acesskeys, bucket name and region , also the RDS instance which the the database for webapp
+
+
+
 
 
 

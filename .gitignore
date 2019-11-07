@@ -109,5 +109,3 @@ venv.bak/
 .idea
 *.iml
 
-#circleci
-.circleci

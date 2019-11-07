@@ -9,7 +9,8 @@ import com.neu.ccwebapp.repository.UserRepository;
 import com.neu.ccwebapp.service.RecipeImgService;
 import com.neu.ccwebapp.service.RecipeService;
 
-        import org.slf4j.Logger;
+import com.timgroup.statsd.StatsDClient;
+import org.slf4j.Logger;
         import org.slf4j.LoggerFactory;
         import org.springframework.beans.factory.annotation.Autowired;
         import org.springframework.http.HttpStatus;
@@ -52,15 +53,19 @@ public class RecipeImageController {
     @Autowired
     UserRepository userRepository;
 
+    @Autowired
+    private StatsDClient statsDClient;
+
+    private final static Logger logger = LoggerFactory.getLogger(RecipeImageController.class);
+
 
 
     @RequestMapping(method = RequestMethod.POST, value = "/v1/recipie/{idRecipe}/image")
     public ResponseEntity<?> addRecipeImage(Principal principal,@PathVariable UUID idRecipe, @RequestParam MultipartFile image, HttpServletRequest request) throws Exception {
 
 
-        System.out.println("file size is "+  image.getSize());
-        System.out.println("file hash is "+  image.hashCode());
 
+        statsDClient.incrementCounter("endpoint.v1.recipie.idRecipe.image.api.post");
 
         String name = principal.getName();
         User u = userRepository.findByUsername(name);
@@ -94,31 +99,28 @@ public class RecipeImageController {
 
 
 
-
-
                     RecipeImage recipeImage = new RecipeImage();
                     //   String photoNewName =  generateFileName(file);
 
                     String photoNewName = recipe.get().getRecipeId()+"/"+image.getOriginalFilename();
 
+                    long startTime =  System.currentTimeMillis();
 
-
-                    UUID Id = UUID.randomUUID(); // Generating UUID for Bookimage Id
-
-                    recipeImage.setId(Id);
-
-
-                    String filePath = recipeImgService.uploadImage(image, photoNewName);
-                    System.out.println("file path is" + filePath);
-
-                    recipeImage.setUrl(filePath);
-
-
+                    recipeImage = recipeImgService.uploadImage(image, photoNewName,recipeImage );
 
 
                     recipe.get().setImage(recipeImage);
 
                     recipeRepository.save(recipe.get());
+
+                    long endTime = System.currentTimeMillis();
+
+                    long duration = (endTime - startTime);
+                    statsDClient.recordExecutionTime("AddRecipeImageAPITime",duration);
+
+                    logger.info("Time to Add Recipe Image"+duration);
+
+
 
                     return ResponseEntity.status(HttpStatus.OK).body(recipeImage);
 
@@ -140,6 +142,8 @@ public class RecipeImageController {
 
     @DeleteMapping("/v1/recipie/{idRecipe}/image/{idImage}")
     public ResponseEntity<?> deleteImage(Principal principal,@PathVariable UUID idRecipe, @PathVariable UUID idImage) throws Exception {
+
+        statsDClient.incrementCounter("endpoint.v1.recipie.idRecipe.image.idImage.api.delete");
 
         String name = principal.getName();
         User u = userRepository.findByUsername(name);
@@ -174,12 +178,23 @@ public class RecipeImageController {
 
                         if (recipe.get().getImage().getId().equals(idImage)) {
 
+                            long startTime =  System.currentTimeMillis();
+
                             recipeImgService.deleteImage(recipeImage,recipe.get().getRecipeId());
 
                             recipe.get().setImage(null);
 
 
                             recipeImgRepository.delete(recipeImage.get());
+
+                            long endTime = System.currentTimeMillis();
+
+                            long duration = (endTime - startTime);
+                            statsDClient.recordExecutionTime("DeleteRecipeImageAPITime",duration);
+
+                            logger.info("Time to Delete Recipe Image"+duration);
+
+
 
                             return ResponseEntity.status(HttpStatus.NO_CONTENT).body("");
 
@@ -206,6 +221,7 @@ public class RecipeImageController {
     @GetMapping("/v1/recipie/{idRecipe}/image/{idImage}")
     public ResponseEntity<?> getImage(@PathVariable UUID idRecipe, @PathVariable UUID idImage) throws Exception {
 
+        statsDClient.incrementCounter("endpoint,v1.recipie.idRecipe.image.idImage.api.get");
 
         Optional<Recipe> recipe = recipeService.findById(idRecipe);
 
@@ -214,8 +230,18 @@ public class RecipeImageController {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("");
         } else {
 
+            long startTime =  System.currentTimeMillis();
 
             Optional<RecipeImage> recipeImage = recipeImgRepository.findById(idImage);
+
+            long endTime = System.currentTimeMillis();
+
+            long duration = (endTime - startTime);
+            statsDClient.recordExecutionTime("GetRecipeImageAPITime",duration);
+
+            logger.info("Time to Get Recipe Image"+duration);
+
+
 
 
             if (recipeImage.isEmpty()) {

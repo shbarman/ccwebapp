@@ -44,7 +44,7 @@ public interface RecipeImgService {
 //
 //    void deleteRecipeImg(Optional<Recipe> recipe, RecipeImage recipeImg) throws Exception;
 
-    public String uploadImage(MultipartFile multipartFile, String emailAddress) throws Exception;
+    public RecipeImage uploadImage(MultipartFile multipartFile, String emailAddress,RecipeImage recipeImage) throws Exception;
 
 
 
