@@ -176,20 +176,24 @@ public class RecipeController {
 
         String username = principal.getName();
         User userLoggedIn = userRepository.findByUsername(username);
-
+    logger.info("Deleting recipe");
         if (recipeService.findById(id).isPresent()) {
 
             Optional<Recipe> recipe = recipeService.findById(id);
 
             if (userLoggedIn.getUserID().equals(recipe.get().getAuthorid())) {
 
+                if(recipe.get().getImage()!=null){
 
-                UUID recipeImageID=recipe.get().getImage().getId();
-                Optional<RecipeImage> recipeImage = recipeImgRepository.findById(recipeImageID);
+                    UUID recipeImageID=recipe.get().getImage().getId();
+                    Optional<RecipeImage> recipeImage = recipeImgRepository.findById(recipeImageID);
+                    recipeImgService.deleteImage(recipeImage,recipe.get().getRecipeId());
+                }
+
 
                 long startTime =  System.currentTimeMillis();
 
-                recipeImgService.deleteImage(recipeImage,recipe.get().getRecipeId());
+
                 recipeService.deleteByRecipesAuthorId(recipe.get().getRecipeId());
 
                 long endTime = System.currentTimeMillis();
