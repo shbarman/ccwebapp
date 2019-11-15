@@ -250,6 +250,7 @@ resource "aws_launch_configuration" "asg_launch_config" {
      delete_on_termination="true"  
     } 
     security_groups= [aws_security_group.application.id]
+    associate_public_ip_address=true
 }
 
 
@@ -361,7 +362,7 @@ resource "aws_cloudwatch_metric_alarm" "memory-low" {
 
 #AWS route53 record
 resource "aws_route53_record" "csye-ns" {
-   zone_id = "Z1TQGKXP2S9MK6"
+   zone_id = "ZT6PAAOHNEPLD"
    name = "${var.route53Name}."
    type    = "A"
    alias {

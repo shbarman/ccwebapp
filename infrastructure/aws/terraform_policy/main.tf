@@ -208,7 +208,10 @@ resource "aws_iam_policy" "CircleCI-Code-Deploy" {
       "Action": [
         "codedeploy:RegisterApplicationRevision",
         "codedeploy:GetApplicationRevision",
-        "codedeploy:ListApplicationRevisions"
+        "codedeploy:ListApplicationRevisions",
+        "ec2:RunInstances",
+        "ec2:CreateTags",
+        "iam:PassRole"
       ],
       "Resource": [
         "arn:aws:codedeploy:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:application:${aws_codedeploy_app.csye6225-webapp.name}"
@@ -218,10 +221,7 @@ resource "aws_iam_policy" "CircleCI-Code-Deploy" {
       "Effect": "Allow",
       "Action": [
         "codedeploy:CreateDeployment",
-        "codedeploy:GetDeployment",
-        "elasticloadbalancing:DescribeTargetGroups",
-         "autoscaling:AttachLoadBalancerTargetGroups"
-
+        "codedeploy:GetDeployment"
       ],
       "Resource": [
         "arn:aws:codedeploy:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:deploymentgroup:${aws_codedeploy_app.csye6225-webapp.name}/${aws_codedeploy_deployment_group.csye6225-webapp-deployment.deployment_group_name}"
