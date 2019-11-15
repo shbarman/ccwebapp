@@ -218,7 +218,10 @@ resource "aws_iam_policy" "CircleCI-Code-Deploy" {
       "Effect": "Allow",
       "Action": [
         "codedeploy:CreateDeployment",
-        "codedeploy:GetDeployment"
+        "codedeploy:GetDeployment",
+        "elasticloadbalancing:DescribeTargetGroups",
+         "autoscaling:AttachLoadBalancerTargetGroups"
+
       ],
       "Resource": [
         "arn:aws:codedeploy:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:deploymentgroup:${aws_codedeploy_app.csye6225-webapp.name}/${aws_codedeploy_deployment_group.csye6225-webapp-deployment.deployment_group_name}"
