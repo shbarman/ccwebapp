@@ -250,8 +250,8 @@ resource "aws_launch_configuration" "asg_launch_config" {
      delete_on_termination="true"  
     } 
     security_groups= [aws_security_group.application.id]
-    associate_public_ip_address=true
-}
+    #associate_public_ip_address=true
+  }
 
 
 
