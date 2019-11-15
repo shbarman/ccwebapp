@@ -245,6 +245,7 @@ resource "aws_codedeploy_deployment_group" "csye6225-webapp-deployment" {
   deployment_group_name = "csye6225-webapp-deployment"
   depends_on=[aws_iam_role.CodeDeployServiceRole]
   service_role_arn      = "${aws_iam_role.CodeDeployServiceRole.arn}"
+  autoscaling_groups = ["AutoScalingGroup"]
   
   ec2_tag_set {
     ec2_tag_filter {
