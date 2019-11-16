@@ -96,7 +96,7 @@ jobs:
             echo "------------------------------------------------------"
             aws deploy list-application-revisions --region ${AWS_REGION} --application-name csye6225-webapp \
             --s-3-bucket ${CODEDEPLOY_S3_BUCKET} --deployed exclude
-            echo "------------------------------------------------------"
+            echo "-----------------------------------------------------"
             deploymentId=$(aws deploy create-deployment --region ${AWS_REGION} \
             --application-name csye6225-webapp \
             --deployment-config-name CodeDeployDefault.AllAtOnce \
