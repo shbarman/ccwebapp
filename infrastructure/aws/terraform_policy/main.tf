@@ -2,6 +2,9 @@ variable "code_deploy_name"{
   description="ENTER NAME FOR CODE DEPLOY LIKE codedeploy.csyeshbarman.me"
   type=string
 }
+variable "lambda_bucket_name"{
+  type=string
+}
 
 data "aws_caller_identity" "current" {}
 
@@ -88,7 +91,7 @@ resource "aws_iam_policy" "CircleCI-Upload-To-S3" {
         {
             "Effect": "Allow",
             "Action": ["s3:PutObject","s3:GetObject", "s3:DeleteObject","s3:GetObjectAcl", "s3:GetObjectVersionAcl", "s3:ListBucket","s3:ListAllMyBuckets"],
-            "Resource": ["arn:aws:s3:::${var.code_deploy_name}/*"]
+            "Resource": ["arn:aws:s3:::${var.code_deploy_name}/*", "arn:aws:s3:::${var.lambda_bucket_name}/*" ]
         }
     ]
 }
@@ -268,3 +271,4 @@ resource "aws_codedeploy_deployment_group" "csye6225-webapp-deployment" {
           ]
   }
 }
+

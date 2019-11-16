@@ -22,10 +22,20 @@ variable "EC2ServiceRoleName"{
 	type=string
 }
 
+variable "domain"{
+  type=string
+}
+
+variable "lambda_s3_bucket"{
+  type=string
+}
+
 module "ec2" {
     source = "./ec2"
     VPC_ID=var.VPC_ID
     ami_id=var.ami_id
     bucketName=var.bucketName
     EC2ServiceRoleName=var.EC2ServiceRoleName
+    domain=var.domain
+  lambda_s3_bucket=var.lambda_s3_bucket
 }
