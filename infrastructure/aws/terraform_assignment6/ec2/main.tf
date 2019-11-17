@@ -27,10 +27,7 @@ variable "bucketName"{
 	type=string
 }
 
-variable "EC2ServiceRoleName"{
-	description = "Enter EC2ServiceRoleName"
-	type=string
-}
+
 variable "dbuser"{	
 	type=string
   default="dbuser"
@@ -38,6 +35,22 @@ variable "dbuser"{
 variable "dbpassword"{	
 	type=string
   default="Ubuntu123$"
+}
+
+variable "EC2ServiceRoleName"{
+	description = "Enter EC2ServiceRoleName"
+	type=string
+}
+variable "CodeDeployServiceARN"{
+	description = "Enter CodeDeployServiceARN"
+	type=string
+
+}
+
+variable "Hosted_ZONE_ID" {
+	description = "Enter ROUTE53 hosted zone ID"
+	type=string
+  
 }
 
 
@@ -198,18 +211,19 @@ resource "aws_lb_target_group" "awsLbTargetGroup" {
 resource "aws_security_group" "lb" {
   name = "lb"
   vpc_id=var.VPC_ID
-  egress {
-    from_port = 0
-    to_port = 0
-    protocol = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
+
   ingress {
     from_port = 443
     to_port = 443
     protocol = "tcp"
     cidr_blocks = ["0.0.0.0/0"]
   }
+      egress {
+     from_port   = 0
+     to_port     = 0
+     protocol    = "-1"
+     cidr_blocks = ["0.0.0.0/0"]
+   }
 }
 
 
@@ -349,7 +363,7 @@ resource "aws_cloudwatch_metric_alarm" "memory-low" {
 
 #AWS route53 record
 resource "aws_route53_record" "csye-ns" {
-   zone_id = "ZT6PAAOHNEPLD"
+   zone_id = "${var.Hosted_ZONE_ID}"
    name = "${var.route53Name}."
    type    = "A"
    alias {
@@ -372,3 +386,97 @@ resource "aws_lb_listener" "loadbalnce_listener" {
     target_group_arn = "${aws_lb_target_group.awsLbTargetGroup.arn}"
   }
 }
+
+
+
+resource "aws_codedeploy_app" "csye6225-webapp" {
+  compute_platform = "Server"
+  name             = "csye6225-webapp"
+}
+
+
+resource "aws_codedeploy_deployment_group" "csye6225-webapp-deployment" {
+  app_name              = "${aws_codedeploy_app.csye6225-webapp.name}"
+  deployment_group_name = "csye6225-webapp-deployment"
+  depends_on=[aws_autoscaling_group.csye6225-autoscaling-deployment]
+  service_role_arn      = "${var.CodeDeployServiceARN}"
+  autoscaling_groups = ["csye6225-autoscaling-deployment"]
+  
+  ec2_tag_set {
+    ec2_tag_filter {
+      key   = "Name"
+      type  = "KEY_AND_VALUE"
+      value = "Web Server"
+    }
+  }
+
+  deployment_style {
+    deployment_option = "WITHOUT_TRAFFIC_CONTROL"
+    deployment_type   = "IN_PLACE"
+  }
+
+  deployment_config_name = "CodeDeployDefault.AllAtOnce"
+
+  auto_rollback_configuration {
+    enabled = true
+    events  = [
+            "DEPLOYMENT_FAILURE"
+          ]
+  }
+}
+
+resource "aws_iam_policy" "CircleCI-Code-Deploy" {
+  name        = "CircleCI-Code-Deploy"
+  description = "A Upload policy"
+  depends_on = [aws_codedeploy_deployment_group.csye6225-webapp-deployment, aws_codedeploy_app.csye6225-webapp]
+
+  policy = <<EOF
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Effect": "Allow",
+      "Action": [
+        "codedeploy:RegisterApplicationRevision",
+        "codedeploy:GetApplicationRevision",
+        "codedeploy:ListApplicationRevisions"
+      ],
+      "Resource": [
+        "arn:aws:codedeploy:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:application:${aws_codedeploy_app.csye6225-webapp.name}"
+      ]
+    },
+    {
+      "Effect": "Allow",
+      "Action": [
+        "codedeploy:CreateDeployment",
+        "codedeploy:GetDeployment"
+      ],
+      "Resource": [
+        "arn:aws:codedeploy:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:deploymentgroup:${aws_codedeploy_app.csye6225-webapp.name}/${aws_codedeploy_deployment_group.csye6225-webapp-deployment.deployment_group_name}"
+      ]
+    },
+    {
+      "Effect": "Allow",
+      "Action": [
+        "codedeploy:GetDeploymentConfig"
+      ],
+      "Resource": [
+        "arn:aws:codedeploy:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:deploymentconfig:CodeDeployDefault.OneAtATime",
+        "arn:aws:codedeploy:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:deploymentconfig:CodeDeployDefault.HalfAtATime",
+        "arn:aws:codedeploy:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:deploymentconfig:CodeDeployDefault.AllAtOnce"
+      ]
+    }
+  ]
+}
+EOF
+}
+
+resource "aws_iam_policy_attachment" "CircleCI-Code-Deploy-policy-attach" {
+  name       = "CircleCI-Code-Deploy"
+  users      = ["circleci"]
+  policy_arn = "${aws_iam_policy.CircleCI-Code-Deploy.arn}"
+}
+
+
+
+

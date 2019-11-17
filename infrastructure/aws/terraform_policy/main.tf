@@ -107,11 +107,7 @@ resource "aws_iam_policy_attachment" "circleci-upload-policy-attach" {
   policy_arn = "${aws_iam_policy.CircleCI-Upload-To-S3.arn}"
 }
 
-resource "aws_iam_policy_attachment" "CircleCI-Code-Deploy-policy-attach" {
-  name       = "CircleCI-Code-Deploy"
-  users      = ["circleci"]
-  policy_arn = "${aws_iam_policy.CircleCI-Code-Deploy.arn}"
-}
+
 
 resource "aws_iam_role" "EC2ServiceRole" {
   name = "EC2ServiceRole"
@@ -189,83 +185,3 @@ resource "aws_iam_role_policy_attachment" "CodeDeployServiceRole_codeDeploy_poli
   policy_arn = "arn:aws:iam::aws:policy/service-role/AWSCodeDeployRole"
 }
 
-resource "aws_codedeploy_app" "csye6225-webapp" {
-  compute_platform = "Server"
-  name             = "csye6225-webapp"
-}
-
-resource "aws_iam_policy" "CircleCI-Code-Deploy" {
-  name        = "CircleCI-Code-Deploy"
-  description = "A Upload policy"
-  depends_on = [aws_codedeploy_deployment_group.csye6225-webapp-deployment, aws_codedeploy_app.csye6225-webapp]
-
-  policy = <<EOF
-{
-  "Version": "2012-10-17",
-  "Statement": [
-    {
-      "Effect": "Allow",
-      "Action": [
-        "codedeploy:RegisterApplicationRevision",
-        "codedeploy:GetApplicationRevision",
-        "codedeploy:ListApplicationRevisions"
-      ],
-      "Resource": [
-        "arn:aws:codedeploy:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:application:${aws_codedeploy_app.csye6225-webapp.name}"
-      ]
-    },
-    {
-      "Effect": "Allow",
-      "Action": [
-        "codedeploy:CreateDeployment",
-        "codedeploy:GetDeployment"
-      ],
-      "Resource": [
-        "arn:aws:codedeploy:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:deploymentgroup:${aws_codedeploy_app.csye6225-webapp.name}/${aws_codedeploy_deployment_group.csye6225-webapp-deployment.deployment_group_name}"
-      ]
-    },
-    {
-      "Effect": "Allow",
-      "Action": [
-        "codedeploy:GetDeploymentConfig"
-      ],
-      "Resource": [
-        "arn:aws:codedeploy:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:deploymentconfig:CodeDeployDefault.OneAtATime",
-        "arn:aws:codedeploy:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:deploymentconfig:CodeDeployDefault.HalfAtATime",
-        "arn:aws:codedeploy:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:deploymentconfig:CodeDeployDefault.AllAtOnce"
-      ]
-    }
-  ]
-}
-EOF
-}
-
-resource "aws_codedeploy_deployment_group" "csye6225-webapp-deployment" {
-  app_name              = "${aws_codedeploy_app.csye6225-webapp.name}"
-  deployment_group_name = "csye6225-webapp-deployment"
-  depends_on=[aws_iam_role.CodeDeployServiceRole]
-  service_role_arn      = "${aws_iam_role.CodeDeployServiceRole.arn}"
-  autoscaling_groups = ["csye6225-autoscaling-deployment"]
-  
-  ec2_tag_set {
-    ec2_tag_filter {
-      key   = "Name"
-      type  = "KEY_AND_VALUE"
-      value = "Web Server"
-    }
-  }
-
-  deployment_style {
-    deployment_option = "WITHOUT_TRAFFIC_CONTROL"
-    deployment_type   = "IN_PLACE"
-  }
-
-  deployment_config_name = "CodeDeployDefault.AllAtOnce"
-
-  auto_rollback_configuration {
-    enabled = true
-    events  = [
-            "DEPLOYMENT_FAILURE"
-          ]
-  }
-}
