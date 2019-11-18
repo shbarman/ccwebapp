@@ -8,10 +8,12 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
 import java.util.UUID;
 
 
 public interface RecipeRepository extends JpaRepository<Recipe, UUID> {
 
-
+  //  @Query(value = "SELECT * FROM RECIPE WHERE  authorid= ?1", nativeQuery = true)
+    List<Recipe> findByAuthorid(UUID authorid);
 }

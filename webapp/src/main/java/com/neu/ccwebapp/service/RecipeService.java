@@ -14,6 +14,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -84,6 +85,27 @@ public class RecipeService {
         }
 
 
+    }
+
+    public List<Recipe> getAllRecipes(UUID id) {
+
+        try{
+            long startTime =  System.currentTimeMillis();
+
+            List<Recipe> allRecipes=recipeRepository.findByAuthorid(id);
+            long endTime = System.currentTimeMillis();
+
+            long duration = (endTime - startTime);
+
+            statsDClient.recordExecutionTime("dbQueryTimeGetAllRecipe",duration);
+
+            logger.info("Get All recipe from DB");
+
+            return allRecipes;
+        }catch(Exception exc) {
+            logger.error("Could not find Recipes for the given userId");
+            return null;
+        }
 
 
     }
