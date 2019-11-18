@@ -58,10 +58,6 @@ public class RecipeController {
     @Autowired
     private StatsDClient statsDClient;
 
-    @Value("${amazonProperties.accessKey}")
-    private String aceess;
-    @Value("${amazonProperties.secretKey}")
-    private String secret;
 
     private final static Logger logger = LoggerFactory.getLogger(RecipeController.class);
 
@@ -259,7 +255,7 @@ public class RecipeController {
         System.out.println("the email address "+ jsonObj.get("UserEmailAddress"));
 
 
-            AmazonSNS sns = AmazonSNSClientBuilder.standard().withCredentials(new AWSStaticCredentialsProvider(new BasicAWSCredentials(aceess, secret))).build();
+            AmazonSNS sns = AmazonSNSClientBuilder.standard().build();
 
             String topic = sns.createTopic("EmailNotificationRecipeEndpoint").getTopicArn();
             logger.info(topic);
