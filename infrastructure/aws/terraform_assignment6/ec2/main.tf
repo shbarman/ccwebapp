@@ -50,7 +50,13 @@ variable "CodeDeployServiceARN"{
 variable "Hosted_ZONE_ID" {
 	description = "Enter ROUTE53 hosted zone ID"
 	type=string
-  
+}
+variable "domain"{
+  type=string
+}
+
+variable "lambda_s3_bucket"{
+  type=string
 }
 
 
@@ -480,3 +486,192 @@ resource "aws_iam_policy_attachment" "CircleCI-Code-Deploy-policy-attach" {
 
 
 
+
+resource "aws_lambda_permission" "with_sns" {
+  statement_id  = "AllowExecutionFromSNS"
+  action        = "lambda:InvokeFunction"
+  function_name = "${aws_lambda_function.lambdafunc.function_name}"
+  principal     = "sns.amazonaws.com"
+  source_arn    = "${aws_sns_topic.EmailNotificationRecipeEndpoint.arn}"
+  depends_on      = [aws_lambda_function.lambdafunc]
+}
+
+
+resource "aws_sns_topic" "EmailNotificationRecipeEndpoint" {
+  name = "EmailNotificationRecipeEndpoint"
+}
+
+resource "aws_sns_topic_subscription" "lambda" {
+  topic_arn = "${aws_sns_topic.EmailNotificationRecipeEndpoint.arn}"
+  protocol  = "lambda"
+  endpoint  = "${aws_lambda_function.lambdafunc.arn}"
+  depends_on      = [aws_lambda_function.lambdafunc]
+}
+
+
+resource "aws_iam_policy" "CircleCI-update-lambda-To-S3" {
+  name        = "CircleCI-update-lambda-To-S3"
+  description = "A Upload policy"
+  depends_on = [aws_lambda_function.lambdafunc]
+  policy = <<EOF
+{
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Sid": "ActionsWhichSupportResourceLevelPermissions",
+            "Effect": "Allow",
+            "Action": [
+                "lambda:AddPermission",
+                "lambda:RemovePermission",
+                "lambda:CreateAlias",
+                "lambda:UpdateAlias",
+                "lambda:DeleteAlias",
+                "lambda:UpdateFunctionCode",
+                "lambda:UpdateFunctionConfiguration",
+                "lambda:PutFunctionConcurrency",
+                "lambda:DeleteFunctionConcurrency",
+                "lambda:PublishVersion"
+            ],
+            "Resource": "arn:aws:lambda:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:function:sns_lambda_function"
+        }
+   ]
+}
+EOF
+}
+
+resource "aws_iam_policy_attachment" "circleci-update-policy-attach" {
+  name       = "circleci-policy"
+  users      = ["circleci"]
+  policy_arn = "${aws_iam_policy.CircleCI-update-lambda-To-S3.arn}"
+}
+
+
+resource "aws_lambda_function" "lambdafunc" {
+
+function_name = "sns_lambda_function"
+  role          = "${aws_iam_role.CodeDeployAWSLabdaRole.arn}"
+  handler       = "com.neu.LambdaEmail.EmailEvent::handleRequest"
+  runtime       = "java8"
+  s3_bucket = var.lambda_s3_bucket
+  s3_key = "dummy.zip"
+  memory_size     = 256
+  timeout         = 180
+  reserved_concurrent_executions  = 5
+  environment  {
+    variables = {
+      domain = var.domain
+      table  = module.rds_instance.dynamodb_table
+    }
+  }
+  tags = {
+    Name = "Lambda Email"
+  }
+}
+
+
+resource "aws_iam_role" "CodeDeployAWSLabdaRole" {
+  name = "iam_for_lambda_with_sns"
+
+  assume_role_policy = <<EOF
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Action": "sts:AssumeRole",
+      "Principal": {
+        "Service": "lambda.amazonaws.com"
+      },
+      "Effect": "Allow",
+      "Sid": ""
+    }
+  ]
+}
+EOF
+  tags = {
+    Name = "CodeDeployAWSLabdaRole"
+  }
+}
+
+resource "aws_iam_policy" "lambda_policy" {
+  name        = "lambda"
+  depends_on = [aws_sns_topic.EmailNotificationRecipeEndpoint]
+  policy = <<EOF
+{
+          "Version" : "2012-10-17",
+          "Statement": [
+            {
+        "Sid" : "LambdaDynamoDBAccess",
+        "Effect" : "Allow",
+        "Action" : [
+          "dynamodb:GetItem",
+          "dynamodb:PutItem",
+          "dynamodb:UpdateItem"
+        ],
+         "Resource" : "arn:aws:dynamodb:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:table/csye6225"
+      },
+      {
+        "Sid" : "LambdaSESAccess",
+        "Effect": "Allow",
+        "Action": [
+          "ses:VerifyEmailAddress",
+          "ses:SendEmail",
+          "ses:SendRawEmail"
+        ],
+          "Resource": "arn:aws:ses:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:identity/*"
+      },
+      {
+        "Sid" : "LambdaS3Access",
+        "Effect": "Allow",
+        "Action": [ "s3:GetObject"],
+       "Resource": "arn:aws:s3:::${var.lambda_s3_bucket}/*"
+      },
+      {
+        "Sid" : "LambdaSNSAccess",
+        "Effect": "Allow",
+        "Action": [ "sns:ConfirmSubscription"],
+       "Resource": "${aws_sns_topic.EmailNotificationRecipeEndpoint.arn}"
+      }
+          ]
+        }
+EOF
+}
+
+resource "aws_iam_policy" "topic_policy" {
+  name        = "Topic"
+  description = ""
+  depends_on  = [aws_sns_topic.EmailNotificationRecipeEndpoint]
+  policy = <<EOF
+{
+          "Version" : "2012-10-17",
+          "Statement": [
+          {
+        "Sid"     : "AllowEC2ToPublishToSNSTopic",
+        "Effect"  : "Allow",
+        "Action"  : [
+            "sns:Publish",
+            "sns:CreateTopic"
+        ],
+        "Resource": "${aws_sns_topic.EmailNotificationRecipeEndpoint.arn}"
+      }
+          ]
+        }
+  EOF
+}
+
+resource "aws_iam_role_policy_attachment" "lambda_execution_policy_attach_role" {
+  role       = "${aws_iam_role.CodeDeployAWSLabdaRole.name}"
+  depends_on = [aws_iam_role.CodeDeployAWSLabdaRole]
+  policy_arn = "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+}
+
+resource "aws_iam_role_policy_attachment" "lambda_policy_attach_role" {
+  role       = "${aws_iam_role.CodeDeployAWSLabdaRole.name}"
+  depends_on = [aws_iam_role.CodeDeployAWSLabdaRole]
+  policy_arn = "${aws_iam_policy.lambda_policy.arn}"
+}
+
+resource "aws_iam_role_policy_attachment" "topic_policy_attach_role" {
+  role       = "${aws_iam_role.CodeDeployAWSLabdaRole.name}"
+  depends_on = [aws_iam_role.CodeDeployAWSLabdaRole]
+  policy_arn = "${aws_iam_policy.topic_policy.arn}"
+}
