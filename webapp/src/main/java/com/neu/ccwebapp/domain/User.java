@@ -63,10 +63,13 @@ public class User
     @UpdateTimestamp
     @Column
     private LocalDateTime account_updated;
-    
+
     @CreationTimestamp
     private LocalDateTime accountCreated;
 
+    public User(){
+
+    }
 
     public User(UUID userID, String first_name, String last_name, String username, String password, LocalDateTime accountCreated, LocalDateTime account_updated) {
         this.first_name = first_name;
