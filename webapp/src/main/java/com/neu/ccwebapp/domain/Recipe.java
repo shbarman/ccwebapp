@@ -20,7 +20,7 @@ public class Recipe
 
     @CreationTimestamp
     @Column
-    private Date created_ts;
+    private Date createdts;
 
     @UpdateTimestamp
     @Column
@@ -102,11 +102,11 @@ public class Recipe
     }
 
     public Date getCreated_ts() {
-        return created_ts;
+        return createdts;
     }
 
     public void setCreated_ts() {
-        this.created_ts = new Date();
+        this.createdts = new Date();
     }
 
     public Date getUpdated_ts() {
@@ -214,7 +214,7 @@ public class Recipe
 
 
     public Recipe(Date created_ts, Date updated_ts, UUID authorid, Integer cook_time_in_min, Integer prep_time_in_min, Integer total_time_in_min, String title, String cuisine, @Range(min = 1, max = 5) Integer servings, List<String> ingredients, Set<OrderedList> steps, NutritionInformation nutritionInformation) {
-        this.created_ts = created_ts;
+        this.createdts = created_ts;
         this.updated_ts = updated_ts;
         this.authorid = authorid;
         this.cook_time_in_min = cook_time_in_min;
