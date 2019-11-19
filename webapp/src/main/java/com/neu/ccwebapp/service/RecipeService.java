@@ -127,6 +127,27 @@ public class RecipeService {
          ResponseEntity.status(HttpStatus.NO_CONTENT).body("Deleted Recipe");
     }
 
+    public Recipe getLatestRecipie() {
+        try{
+            long startTime = System.currentTimeMillis();
+            Recipe latestRecipe = null;
+            if(recipeRepository.findFirstByCreated_ts().get(0)!=null) {
+                latestRecipe = recipeRepository.findFirstByCreated_ts().get(0);
+            }
+
+            long endTime = System.currentTimeMillis();
+            long duration = (endTime - startTime);
+
+            statsDClient.recordExecutionTime("dbQueryLatestRecipe",duration);
+            logger.info("Get latest recipe from DB");
+
+            return latestRecipe;
+        } catch (Exception exc) {
+            logger.error("Could not get latest Recipe from the dB");
+            return null;
+        }
+    }
+
 
 
     public void updateRecipe(Recipe recFound,Recipe recipe) throws RecipeDoesNotExistException {

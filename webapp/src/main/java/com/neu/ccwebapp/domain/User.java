@@ -67,6 +67,14 @@ public class User
     @CreationTimestamp
     private LocalDateTime account_created;
 
+
+    public User(UUID userID, String first_name, String last_name, String username, String password, LocalDateTime account_created, LocalDateTime account_updated) {
+        this.first_name = first_name;
+        this.last_name = last_name;
+        this.username = username;
+        this.password = password;
+    }
+
     public String getUsername() {
         System.out.println(username);
         return username;
