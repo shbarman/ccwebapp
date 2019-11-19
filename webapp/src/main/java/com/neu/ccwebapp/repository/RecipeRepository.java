@@ -15,6 +15,6 @@ import java.util.UUID;
 public interface RecipeRepository extends JpaRepository<Recipe, UUID> {
 
   //  @Query(value = "SELECT * FROM RECIPE WHERE  authorid= ?1", nativeQuery = true)
-    List<Recipe> findByAuthorid(UUID authorid);
-  List<Recipe> findFirstByCreated_ts();
+  List<Recipe> findByAuthorid(UUID authorid);
+  List<Recipe> findFirstBycreated_ts();
 }
