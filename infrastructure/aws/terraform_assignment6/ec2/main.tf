@@ -303,13 +303,18 @@ resource "aws_iam_role_policy_attachment" "EC2ServiceRole_CRUD_policy_attach" {
 resource "aws_autoscaling_group" "csye6225-autoscaling-deployment" {
   #depends_on = [aws_codedeploy_deployment_group.csye6225-webapp-deployment, aws_codedeploy_app.csye6225-webapp]
   name= "csye6225-autoscaling-deployment"
-  max_size = 10
+  max_size = 5
    min_size = 3
-  # desired_capacity = 3
-  # default_cooldown = 10
+  desired_capacity = 3
+  default_cooldown = 60
   target_group_arns = ["${aws_lb_target_group.awsLbTargetGroup.arn}"]
   launch_configuration = "${aws_launch_configuration.asg_launch_config.id}"
   vpc_zone_identifier = ["${data.aws_subnet.sb_cidr.0.id}", "${data.aws_subnet.sb_cidr.1.id}"]
+  tag{
+    key="env"
+    propagate_at_launch=true
+    value="prod"
+  }
 }
 
 #Scale Up
@@ -330,41 +335,38 @@ resource "aws_autoscaling_policy" "csye6225-autoscaling-deployment-scale-down" {
 }
 
 #Alarm when memory load is high
-resource "aws_cloudwatch_metric_alarm" "memory-high" {
-    alarm_name = "mem-util-high-agents"
-    comparison_operator = "GreaterThanOrEqualToThreshold"
-    evaluation_periods = "2"
-    metric_name = "MemoryUtilization"
-    namespace = "System/Linux"
-    period = "60"
-    statistic = "Average"
-    threshold = "5"
-      dimensions = {
+resource "aws_cloudwatch_metric_alarm" "CPUAlarm-High" {
+  alarm_name = "CPUAlarmHighAgent"
+  comparison_operator = "GreaterThanThreshold"
+  evaluation_periods = 2
+  threshold = 5
+  metric_name = "CPUUtilization"
+  statistic = "Average"
+  namespace = "AWS/EC2"
+  dimensions = {
     AutoScalingGroupName = "${aws_autoscaling_group.csye6225-autoscaling-deployment.name}"
   }
-    alarm_description = "This metric monitors ec2 memory for high utilization on agent hosts"
-    alarm_actions = [
-        "${aws_autoscaling_policy.csye6225-autoscaling-deployment-scale-up.arn}"
-    ]
+
+  alarm_actions = [aws_autoscaling_policy.csye6225-autoscaling-deployment-scale-up.arn]
+  alarm_description = "Scale-up if CPU > 5%"
+  period = 300
 }
 
 #Alarm when memory is low
-resource "aws_cloudwatch_metric_alarm" "memory-low" {
-    alarm_name = "mem-util-low-agents"
-    comparison_operator = "LessThanOrEqualToThreshold"
-    evaluation_periods = "2"
-    metric_name = "MemoryUtilization"
-    namespace = "System/Linux"
-    period = "60"
-    statistic = "Average"
-    threshold = "3"
-    dimensions = {
+resource "aws_cloudwatch_metric_alarm" "CPUAlarmLow" {
+  alarm_name = "CPUAlarmLowAgent"
+  comparison_operator = "LessThanThreshold"
+  evaluation_periods = 2
+  threshold = 3
+  metric_name = "CPUUtilization"
+  statistic = "Average"
+  namespace = "AWS/EC2"
+  dimensions = {
     AutoScalingGroupName = "${aws_autoscaling_group.csye6225-autoscaling-deployment.name}"
   }
-    alarm_description = "This metric monitors ec2 memory for low utilization on agent hosts"
-    alarm_actions = [
-        "${aws_autoscaling_policy.csye6225-autoscaling-deployment-scale-down.arn}"
-    ]
+  alarm_actions = [aws_autoscaling_policy.csye6225-autoscaling-deployment-scale-down.arn]
+  alarm_description = "Scale-up if CPU < 3%"
+  period = 300
 }
 
 #AWS route53 record
@@ -547,16 +549,14 @@ resource "aws_iam_policy" "EC2-To-SNS" {
 {
     "Version": "2012-10-17",
    "Statement": [
-    {
-      "Sid": "AWSConfigSNSPolicy20150201",
-      "Action": [
-        "SNS:Publish"
-      ],
-      "Effect": "Allow",
-      "Resource": "arn:aws:sns:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:${aws_sns_topic.EmailNotificationRecipeEndpoint.name}"
-
-    }
-  ]
+            {
+              "Sid": "AllowEC2ToPublishToSNSTopic",
+              "Effect": "Allow",
+              "Action": ["sns:Publish",
+              "sns:CreateTopic"],
+              "Resource": "${aws_sns_topic.EmailNotificationRecipeEndpoint.arn}"
+            }
+          ]
 }
 EOF
 
