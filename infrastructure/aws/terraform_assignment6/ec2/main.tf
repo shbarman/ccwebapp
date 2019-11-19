@@ -547,16 +547,14 @@ resource "aws_iam_policy" "EC2-To-SNS" {
 {
     "Version": "2012-10-17",
    "Statement": [
-    {
-      "Sid": "AWSConfigSNSPolicy20150201",
-      "Action": [
-        "SNS:Publish"
-      ],
-      "Effect": "Allow",
-      "Resource": "arn:aws:sns:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:${aws_sns_topic.EmailNotificationRecipeEndpoint.name}"
-
-    }
-  ]
+            {
+              "Sid": "AllowEC2ToPublishToSNSTopic",
+              "Effect": "Allow",
+              "Action": ["sns:Publish",
+              "sns:CreateTopic"],
+              "Resource": "${aws_sns_topic.EmailNotificationRecipeEndpoint.arn}"
+            }
+          ]
 }
 EOF
 
