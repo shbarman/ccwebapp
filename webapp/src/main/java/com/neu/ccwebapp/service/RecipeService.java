@@ -131,8 +131,8 @@ public class RecipeService {
         try{
             long startTime = System.currentTimeMillis();
             Recipe latestRecipe = null;
-            if(recipeRepository.findFirstByaccountCreated().get(0)!=null) {
-                latestRecipe = recipeRepository.findFirstByaccountCreated().get(0);
+            if(recipeRepository.findTopByOrderByCreatedtsDesc()!=null) {
+                latestRecipe = recipeRepository.findTopByOrderByCreatedtsDesc();
             }
 
             long endTime = System.currentTimeMillis();
