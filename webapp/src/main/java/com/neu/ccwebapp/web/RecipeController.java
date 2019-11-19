@@ -224,7 +224,7 @@ public class RecipeController {
         }
     }
 
-    @RequestMapping(value = "/v1/myrecipies", method = RequestMethod.GET)
+    @RequestMapping(value = "/v1/myrecipies", method = RequestMethod.POST)
     public ResponseEntity<?> getAllRecipes(Principal principal) throws Exception {
 
         statsDClient.incrementCounter("endpoint.v1.myrecipies.api.get");
@@ -264,6 +264,26 @@ public class RecipeController {
 
 
         return ResponseEntity.status(HttpStatus.NO_CONTENT).body("");
+    }
+
+    @RequestMapping(value= "/recipes", method = RequestMethod.GET)
+    public ResponseEntity<?> getLatestRecipe()  {
+        statsDClient.incrementCounter("endpoint.v1.recipes.api.get");
+        long startTime = System.currentTimeMillis();
+        Recipe recipe = null;
+        if(recipeService.getLatestRecipie()!=null){
+            recipe = recipeService.getLatestRecipie();
+            logger.info("Latest Recipe fetch successful");
+            long endTime = System.currentTimeMillis();
+            long duration = (endTime - startTime);
+            statsDClient.recordExecutionTime("getRecipieTime", duration);
+            return new ResponseEntity<Recipe>(recipe, HttpStatus.OK);
+        }
+        logger.error("Recipe fetch failed. Recipe not found");
+        long endTime = System.currentTimeMillis();
+        long duration = (endTime - startTime);
+        statsDClient.recordExecutionTime("getRecipieTime", duration);
+        return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
     }
 
 }
