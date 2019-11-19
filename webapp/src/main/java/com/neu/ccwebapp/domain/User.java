@@ -63,7 +63,7 @@ public class User
     @UpdateTimestamp
     @Column
     private LocalDateTime account_updated;
-
+    
     @CreationTimestamp
     private LocalDateTime accountCreated;
 
