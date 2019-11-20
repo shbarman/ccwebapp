@@ -46,6 +46,21 @@ MYSQL(databse)
 
 
 
+### JMETER
+Steps to Replicate the jmeter script
+
+1. Install binaries for APACHE JMETER from https://jmeter.apache.org/download_jmeter.cgi
+2. Go to bin folder after unzip and open terminal and run ./jmeter command
+3. Start by naming your plan.
+4. Add thread group to your plan and set thread group to 500 and ramp up seconds to 100
+5. To thread group add HTTP request set domain name, protocol and path of your endpoint which in our case is post recipie
+6. The post recipe needs authorization and headers so to your request add HTTP authorization manager and HTTP request headers where you can mention the username and password for the user you want to create the recipies.
+7. To monitor your result add a listener result tree to your request.
+7. Save the plan with .jmx extension
+8. Now the run the test plan.
+
+
+
 
 
 
