@@ -53,11 +53,11 @@ public class User
     }
 
     public LocalDateTime getAccount_created() {
-        return account_created;
+        return accountCreated;
     }
 
     public void setAccount_created(LocalDateTime account_created) {
-        this.account_created = account_created;
+        this.accountCreated = account_created;
     }
 
     @UpdateTimestamp
@@ -65,7 +65,18 @@ public class User
     private LocalDateTime account_updated;
 
     @CreationTimestamp
-    private LocalDateTime account_created;
+    private LocalDateTime accountCreated;
+
+    public User(){
+
+    }
+
+    public User(UUID userID, String first_name, String last_name, String username, String password, LocalDateTime accountCreated, LocalDateTime account_updated) {
+        this.first_name = first_name;
+        this.last_name = last_name;
+        this.username = username;
+        this.password = password;
+    }
 
     public String getUsername() {
         System.out.println(username);

@@ -15,7 +15,7 @@ export AWS_ACCESS_KEY =(your access key)
 export AWS_SECRET_KEY =(your secret access key)
 ```
 
-## Steps
+## Steps to run  terraform
 
 ```bash
 terraform init

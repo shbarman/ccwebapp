@@ -15,6 +15,7 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -50,20 +51,23 @@ public class UserServiceImpl implements UserService, UserDetailsService
             throw new UserExistsException("A user with username "+user.getUsername() + " already exists");
         }
 
-        user.setPassword(passwordEncoder.encode(user.getPassword()));
-        long startTime =  System.currentTimeMillis();
+        try {
+            passwordEncoder= new BCryptPasswordEncoder();
+            user.setPassword(passwordEncoder.encode(user.getPassword()));
+            long startTime = System.currentTimeMillis();
 
-        userRepository.save(user);
-        long endTime = System.currentTimeMillis();
+            userRepository.save(user);
+            long endTime = System.currentTimeMillis();
 
-        long duration = (endTime - startTime);
+            long duration = (endTime - startTime);
 
-        statsDClient.recordExecutionTime("dbQueryTimeUpdateUser",duration);
+            statsDClient.recordExecutionTime("dbQueryTimeUpdateUser", duration);
 
-        logger.info("New User has been added to the DB");
-
-
-        return user;
+            logger.info("New User has been added to the DB");
+        } catch (Exception e){
+            return null;
+        }
+        return  user;
 
     }
 
