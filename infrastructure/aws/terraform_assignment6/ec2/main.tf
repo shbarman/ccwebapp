@@ -349,7 +349,7 @@ resource "aws_cloudwatch_metric_alarm" "CPUAlarm-High" {
 
   alarm_actions = [aws_autoscaling_policy.csye6225-autoscaling-deployment-scale-up.arn]
   alarm_description = "Scale-up if CPU > 5%"
-  period = 300
+  period = 60
 }
 
 #Alarm when memory is low
@@ -366,7 +366,7 @@ resource "aws_cloudwatch_metric_alarm" "CPUAlarmLow" {
   }
   alarm_actions = [aws_autoscaling_policy.csye6225-autoscaling-deployment-scale-down.arn]
   alarm_description = "Scale-up if CPU < 3%"
-  period = 300
+  period = 120
 }
 
 #AWS route53 record
