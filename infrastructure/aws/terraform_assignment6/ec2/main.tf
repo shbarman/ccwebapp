@@ -709,210 +709,13 @@ resource "aws_cloudformation_stack" "waf" {
    {
     "AWSTemplateFormatVersion": "2010-09-09",
     "Description": "AWS WAF Basic OWASP Example Rule Set",
-    "Parameters": {
-        "stackPrefix": {
-            "Type": "String",
-            "Description": "The prefix to use when naming resources in this stack. Normally we would use the stack name, but since this template can be used as a resource in other stacks we want to keep the naming consistent. No symbols allowed.",
-            "ConstraintDescription": "Alphanumeric characters only, maximum 10 characters",
-            "AllowedPattern": "^[a-zA-z0-9]+$",
-            "MaxLength": 10,
-            "Default": "generic"
-        },
-        "stackScope": {
-            "Type": "String",
-            "Description": "You can deploy this stack at a regional level, for regional WAF targets like Application Load Balancers, or for global targets, such as Amazon CloudFront distributions.",
-            "AllowedValues": [
-                "Global",
-                "Regional"
-            ],
-            "Default": "Regional"
-        },
-        "ruleAction": {
-            "Type": "String",
-            "Description": "The type of action you want to iplement for the rules in this set. Valid options are COUNT or BLOCK.",
-            "AllowedValues": [
-                "BLOCK",
-                "COUNT"
-            ],
-            "Default": "BLOCK"
-        },
-        "includesPrefix": {
-            "Type": "String",
-            "Description": "This is the URI path prefix (starting with '/') that identifies any files in your webroot that are server-side included components, and should not be invoked directly via URL. These can be headers, footers, 3rd party server side libraries or components. You can add additional prefixes later directly in the set.",
-            "Default": "/includes"
-        },
-        "adminUrlPrefix": {
-            "Type": "String",
-            "Description": "This is the URI path prefix (starting with '/') that identifies your administrative sub-site. You can add additional prefixes later directly in the set.",
-            "Default": "/admin"
-        },
-        "adminRemoteCidr": {
-            "Type": "String",
-            "Description": "This is the IP address allowed to access your administrative interface. Use CIDR notation. You can add additional ones later directly in the set.",
-            "Default": "127.0.0.1/32"
-        },
-        "maxExpectedURISize": {
-            "Type": "Number",
-            "Description": "Maximum number of bytes allowed in the URI component of the HTTP request. Generally the maximum possible value is determined by the server operating system (maps to file system paths), the web server software, or other middleware components. Choose a value that accomodates the largest URI segment you use in practice in your web application.",
-            "Default": 512
-        },
-        "maxExpectedQueryStringSize": {
-            "Type": "Number",
-            "Description": "Maximum number of bytes allowed in the query string component of the HTTP request. Normally the  of query string parameters following the \"?\" in a URL is much larger than the URI , but still bounded by the  of the parameters your web application uses and their values.",
-            "Default": 1024
-        },
-        "maxExpectedBodySize": {
-            "Type": "Number",
-            "Description": "Maximum number of bytes allowed in the body of the request. If you do not plan to allow large uploads, set it to the largest payload value that makes sense for your web application. Accepting unnecessarily large values can cause performance issues, if large payloads are used as an attack vector against your web application.",
-            "Default": 1048576
-        },
-        "maxExpectedCookieSize": {
-            "Type": "Number",
-            "Description": "Maximum number of bytes allowed in the cookie header. The maximum size should be less than 4096, the size is determined by the amount of information your web application stores in cookies. If you only pass a session token via cookies, set the size to no larger than the serialized size of the session token and cookie metadata.",
-            "Default": 4093
-        },
-        "csrfExpectedHeader": {
-            "Type": "String",
-            "Description": "The custom HTTP request header, where the CSRF token value is expected to be encountered",
-            "Default": "x-csrf-token"
-        },
-        "csrfExpectedSize": {
-            "Type": "Number",
-            "Description": "The size in bytes of the CSRF token value. For example if it's a canonically formatted UUIDv4 value the expected size would be 36 bytes/ASCII characters",
-            "Default": 36
-        }
-    },
-    "Metadata": {
-        "AWS::CloudFormation::Interface": {
-            "ParameterGroups": [
-                {
-                    "Label": {
-                        "default": "Resource Prefix"
-                    },
-                    "Parameters": [
-                        "stackPrefix"
-                    ]
-                },
-                {
-                    "Label": {
-                        "default": "WAF Implementation"
-                    },
-                    "Parameters": [
-                        "stackScope",
-                        "ruleAction"
-                    ]
-                },
-                {
-                    "Label": {
-                        "default": "Generic HTTP Request Enforcement"
-                    },
-                    "Parameters": [
-                        "maxExpectedURISize",
-                        "maxExpectedQueryStringSize",
-                        "maxExpectedBodySize",
-                        "maxExpectedCookieSize"
-                    ]
-                },
-                {
-                    "Label": {
-                        "default": "Administrative Interface"
-                    },
-                    "Parameters": [
-                        "adminUrlPrefix",
-                        "adminRemoteCidr"
-                    ]
-                },
-                {
-                    "Label": {
-                        "default": "Cross-Site Request Forgery (CSRF)"
-                    },
-                    "Parameters": [
-                        "csrfExpectedHeader",
-                        "csrfExpectedSize"
-                    ]
-                },
-                {
-                    "Label": {
-                        "default": "Application Specific"
-                    },
-                    "Parameters": [
-                        "includesPrefix"
-                    ]
-                }
-            ],
-            "ParameterLabels": {
-                "stackPrefix": {
-                    "default": "Resource Name Prefix"
-                },
-                "stackScope": {
-                    "default": "Apply to WAF"
-                },
-                "ruleAction": {
-                    "default": "Rule Effect"
-                },
-                "includesPrefix": {
-                    "default": "Server-side components URI prefix"
-                },
-                "adminUrlPrefix": {
-                    "default": "URI prefix"
-                },
-                "adminRemoteCidr": {
-                    "default": "Allowed IP source (CIDR)"
-                },
-                "maxExpectedURISize": {
-                    "default": "Max. size of URI"
-                },
-                "maxExpectedQueryStringSize": {
-                    "default": "Max. size of QUERY STRING"
-                },
-                "maxExpectedBodySize": {
-                    "default": "Max. size of BODY"
-                },
-                "maxExpectedCookieSize": {
-                    "default": "Max. size of COOKIE"
-                },
-                "csrfExpectedHeader": {
-                    "default": "HTTP Request Header"
-                },
-                "csrfExpectedSize": {
-                    "default": "Token Size"
-                }
-            }
-        }
-    },
-    "Conditions": {
-        "isRegional": {
-            "Fn::Equals": [
-                {
-                    "Ref": "stackScope"
-                },
-                "Regional"
-            ]
-        },
-        "isGlobal": {
-            "Fn::Equals": [
-                {
-                    "Ref": "stackScope"
-                },
-                "Global"
-            ]
-        }
-    },
+    
     "Resources": {
         "wafrSQLiSet": {
             "Type": "AWS::WAFRegional::SqlInjectionMatchSet",
-            "Condition": "isRegional",
             "Properties": {
                 "Name": {
-                    "Fn::Join": [
-                        "-",
-                        [
-                            {
-                                "Ref": "stackPrefix"
-                            },
-                            "detect-sqli"
-                        ]
-                    ]
+                    "Fn::Sub": "WAF-detect-sqli"
                 },
                 "SqlInjectionMatchTuples": [
                     {
@@ -948,89 +751,6 @@ resource "aws_cloudformation_stack" "waf" {
                     {
                         "FieldToMatch": {
                             "Type": "BODY"
-                        },
-                        "TextTransformation": "HTML_ENTITY_DECODE"
-                    },
-                    {
-                        "FieldToMatch": {
-                            "Type": "HEADER",
-                            "Data": "cookie"
-                        },
-                        "TextTransformation": "URL_DECODE"
-                    },
-                    {
-                        "FieldToMatch": {
-                            "Type": "HEADER",
-                            "Data": "cookie"
-                        },
-                        "TextTransformation": "HTML_ENTITY_DECODE"
-                    }
-                ]
-            }
-        },
-        "wafgSQLiSet": {
-            "Type": "AWS::WAF::SqlInjectionMatchSet",
-            "Condition": "isGlobal",
-            "Properties": {
-                "Name": {
-                    "Fn::Join": [
-                        "-",
-                        [
-                            {
-                                "Ref": "stackPrefix"
-                            },
-                            "detect-sqli"
-                        ]
-                    ]
-                },
-                "SqlInjectionMatchTuples": [
-                    {
-                        "FieldToMatch": {
-                            "Type": "URI"
-                        },
-                        "TextTransformation": "URL_DECODE"
-                    },
-                    {
-                        "FieldToMatch": {
-                            "Type": "URI"
-                        },
-                        "TextTransformation": "HTML_ENTITY_DECODE"
-                    },
-                    {
-                        "FieldToMatch": {
-                            "Type": "QUERY_STRING"
-                        },
-                        "TextTransformation": "URL_DECODE"
-                    },
-                    {
-                        "FieldToMatch": {
-                            "Type": "QUERY_STRING"
-                        },
-                        "TextTransformation": "HTML_ENTITY_DECODE"
-                    },
-                    {
-                        "FieldToMatch": {
-                            "Type": "BODY"
-                        },
-                        "TextTransformation": "URL_DECODE"
-                    },
-                    {
-                        "FieldToMatch": {
-                            "Type": "BODY"
-                        },
-                        "TextTransformation": "HTML_ENTITY_DECODE"
-                    },
-                    {
-                        "FieldToMatch": {
-                            "Type": "HEADER",
-                            "Data": "cookie"
-                        },
-                        "TextTransformation": "URL_DECODE"
-                    },
-                    {
-                        "FieldToMatch": {
-                            "Type": "HEADER",
-                            "Data": "cookie"
                         },
                         "TextTransformation": "HTML_ENTITY_DECODE"
                     }
@@ -1039,29 +759,10 @@ resource "aws_cloudformation_stack" "waf" {
         },
         "wafrSQLiRule": {
             "Type": "AWS::WAFRegional::Rule",
-            "Condition": "isRegional",
             "Properties": {
-                "MetricName": {
-                    "Fn::Join": [
-                        "",
-                        [
-                            {
-                                "Ref": "stackPrefix"
-                            },
-                            "mitigatesqli"
-                        ]
-                    ]
-                },
+                "MetricName": "mitigatesqli",
                 "Name": {
-                    "Fn::Join": [
-                        "-",
-                        [
-                            {
-                                "Ref": "stackPrefix"
-                            },
-                            "mitigate-sqli"
-                        ]
-                    ]
+                    "Fn::Sub": "WAF-mitigate-sqli"
                 },
                 "Predicates": [
                     {
@@ -1074,94 +775,11 @@ resource "aws_cloudformation_stack" "waf" {
                 ]
             }
         },
-        "wafgSQLiRule": {
-            "Type": "AWS::WAF::Rule",
-            "Condition": "isGlobal",
-            "Properties": {
-                "MetricName": {
-                    "Fn::Join": [
-                        "",
-                        [
-                            {
-                                "Ref": "stackPrefix"
-                            },
-                            "mitigatesqli"
-                        ]
-                    ]
-                },
-                "Name": {
-                    "Fn::Join": [
-                        "-",
-                        [
-                            {
-                                "Ref": "stackPrefix"
-                            },
-                            "mitigate-sqli"
-                        ]
-                    ]
-                },
-                "Predicates": [
-                    {
-                        "Type": "SqlInjectionMatch",
-                        "Negated": false,
-                        "DataId": {
-                            "Ref": "wafgSQLiSet"
-                        }
-                    }
-                ]
-            }
-        },
         "wafrAuthTokenStringSet": {
             "Type": "AWS::WAFRegional::ByteMatchSet",
-            "Condition": "isRegional",
             "Properties": {
                 "Name": {
-                    "Fn::Join": [
-                        "-",
-                        [
-                            {
-                                "Ref": "stackPrefix"
-                            },
-                            "match-auth-tokens"
-                        ]
-                    ]
-                },
-                "ByteMatchTuples": [
-                    {
-                        "FieldToMatch": {
-                            "Type": "HEADER",
-                            "Data": "cookie"
-                        },
-                        "PositionalConstraint": "CONTAINS",
-                        "TargetString": "example-session-id",
-                        "TextTransformation": "URL_DECODE"
-                    },
-                    {
-                        "FieldToMatch": {
-                            "Type": "HEADER",
-                            "Data": "authorization"
-                        },
-                        "PositionalConstraint": "ENDS_WITH",
-                        "TargetString": ".TJVA95OrM7E2cBab30RMHrHDcEfxjoYZgeFONFh7HgQ",
-                        "TextTransformation": "URL_DECODE"
-                    }
-                ]
-            }
-        },
-        "wafgAuthTokenStringSet": {
-            "Type": "AWS::WAF::ByteMatchSet",
-            "Condition": "isGlobal",
-            "Properties": {
-                "Name": {
-                    "Fn::Join": [
-                        "-",
-                        [
-                            {
-                                "Ref": "stackPrefix"
-                            },
-                            "match-auth-tokens"
-                        ]
-                    ]
+                    "Fn::Sub": "WAF-match-auth-tokens"
                 },
                 "ByteMatchTuples": [
                     {
@@ -1187,29 +805,10 @@ resource "aws_cloudformation_stack" "waf" {
         },
         "wafrAuthTokenRule": {
             "Type": "AWS::WAFRegional::Rule",
-            "Condition": "isRegional",
             "Properties": {
-                "MetricName": {
-                    "Fn::Join": [
-                        "",
-                        [
-                            {
-                                "Ref": "stackPrefix"
-                            },
-                            "badauthtokens"
-                        ]
-                    ]
-                },
+                "MetricName": "badauthtokens",
                 "Name": {
-                    "Fn::Join": [
-                        "-",
-                        [
-                            {
-                                "Ref": "stackPrefix"
-                            },
-                            "detect-bad-auth-tokens"
-                        ]
-                    ]
+                    "Fn::Sub": "WAF-detect-bad-auth-tokens"
                 },
                 "Predicates": [
                     {
@@ -1222,57 +821,11 @@ resource "aws_cloudformation_stack" "waf" {
                 ]
             }
         },
-        "wafgAuthTokenRule": {
-            "Type": "AWS::WAF::Rule",
-            "Condition": "isGlobal",
-            "Properties": {
-                "MetricName": {
-                    "Fn::Join": [
-                        "",
-                        [
-                            {
-                                "Ref": "stackPrefix"
-                            },
-                            "badauthtokens"
-                        ]
-                    ]
-                },
-                "Name": {
-                    "Fn::Join": [
-                        "-",
-                        [
-                            {
-                                "Ref": "stackPrefix"
-                            },
-                            "detect-bad-auth-tokens"
-                        ]
-                    ]
-                },
-                "Predicates": [
-                    {
-                        "Type": "ByteMatch",
-                        "Negated": false,
-                        "DataId": {
-                            "Ref": "wafgAuthTokenStringSet"
-                        }
-                    }
-                ]
-            }
-        },
         "wafrXSSSet": {
             "Type": "AWS::WAFRegional::XssMatchSet",
-            "Condition": "isRegional",
             "Properties": {
                 "Name": {
-                    "Fn::Join": [
-                        "-",
-                        [
-                            {
-                                "Ref": "stackPrefix"
-                            },
-                            "detect-xss"
-                        ]
-                    ]
+                    "Fn::Sub": "WAF-detect-xss"
                 },
                 "XssMatchTuples": [
                     {
@@ -1308,89 +861,6 @@ resource "aws_cloudformation_stack" "waf" {
                     {
                         "FieldToMatch": {
                             "Type": "BODY"
-                        },
-                        "TextTransformation": "HTML_ENTITY_DECODE"
-                    },
-                    {
-                        "FieldToMatch": {
-                            "Type": "HEADER",
-                            "Data": "cookie"
-                        },
-                        "TextTransformation": "URL_DECODE"
-                    },
-                    {
-                        "FieldToMatch": {
-                            "Type": "HEADER",
-                            "Data": "cookie"
-                        },
-                        "TextTransformation": "HTML_ENTITY_DECODE"
-                    }
-                ]
-            }
-        },
-        "wafgXSSSet": {
-            "Type": "AWS::WAF::XssMatchSet",
-            "Condition": "isGlobal",
-            "Properties": {
-                "Name": {
-                    "Fn::Join": [
-                        "-",
-                        [
-                            {
-                                "Ref": "stackPrefix"
-                            },
-                            "detect-xss"
-                        ]
-                    ]
-                },
-                "XssMatchTuples": [
-                    {
-                        "FieldToMatch": {
-                            "Type": "URI"
-                        },
-                        "TextTransformation": "URL_DECODE"
-                    },
-                    {
-                        "FieldToMatch": {
-                            "Type": "URI"
-                        },
-                        "TextTransformation": "HTML_ENTITY_DECODE"
-                    },
-                    {
-                        "FieldToMatch": {
-                            "Type": "QUERY_STRING"
-                        },
-                        "TextTransformation": "URL_DECODE"
-                    },
-                    {
-                        "FieldToMatch": {
-                            "Type": "QUERY_STRING"
-                        },
-                        "TextTransformation": "HTML_ENTITY_DECODE"
-                    },
-                    {
-                        "FieldToMatch": {
-                            "Type": "BODY"
-                        },
-                        "TextTransformation": "URL_DECODE"
-                    },
-                    {
-                        "FieldToMatch": {
-                            "Type": "BODY"
-                        },
-                        "TextTransformation": "HTML_ENTITY_DECODE"
-                    },
-                    {
-                        "FieldToMatch": {
-                            "Type": "HEADER",
-                            "Data": "cookie"
-                        },
-                        "TextTransformation": "URL_DECODE"
-                    },
-                    {
-                        "FieldToMatch": {
-                            "Type": "HEADER",
-                            "Data": "cookie"
                         },
                         "TextTransformation": "HTML_ENTITY_DECODE"
                     }
@@ -1399,29 +869,10 @@ resource "aws_cloudformation_stack" "waf" {
         },
         "wafrXSSRule": {
             "Type": "AWS::WAFRegional::Rule",
-            "Condition": "isRegional",
             "Properties": {
-                "MetricName": {
-                    "Fn::Join": [
-                        "",
-                        [
-                            {
-                                "Ref": "stackPrefix"
-                            },
-                            "mitigatexss"
-                        ]
-                    ]
-                },
+                "MetricName": "mitigatexss",
                 "Name": {
-                    "Fn::Join": [
-                        "-",
-                        [
-                            {
-                                "Ref": "stackPrefix"
-                            },
-                            "mitigate-xss"
-                        ]
-                    ]
+                    "Fn::Sub": "WAF-mitigate-xss"
                 },
                 "Predicates": [
                     {
@@ -1434,140 +885,11 @@ resource "aws_cloudformation_stack" "waf" {
                 ]
             }
         },
-        "wafgXSSRule": {
-            "Type": "AWS::WAF::Rule",
-            "Condition": "isGlobal",
-            "Properties": {
-                "MetricName": {
-                    "Fn::Join": [
-                        "",
-                        [
-                            {
-                                "Ref": "stackPrefix"
-                            },
-                            "mitigatexss"
-                        ]
-                    ]
-                },
-                "Name": {
-                    "Fn::Join": [
-                        "-",
-                        [
-                            {
-                                "Ref": "stackPrefix"
-                            },
-                            "mitigate-xss"
-                        ]
-                    ]
-                },
-                "Predicates": [
-                    {
-                        "Type": "XssMatch",
-                        "Negated": false,
-                        "DataId": {
-                            "Ref": "wafgXSSSet"
-                        }
-                    }
-                ]
-            }
-        },
         "wafrPathsStringSet": {
             "Type": "AWS::WAFRegional::ByteMatchSet",
-            "Condition": "isRegional",
             "Properties": {
                 "Name": {
-                    "Fn::Join": [
-                        "-",
-                        [
-                            {
-                                "Ref": "stackPrefix"
-                            },
-                            "match-rfi-lfi-traversal"
-                        ]
-                    ]
-                },
-                "ByteMatchTuples": [
-                    {
-                        "FieldToMatch": {
-                            "Type": "URI"
-                        },
-                        "PositionalConstraint": "CONTAINS",
-                        "TargetString": "../",
-                        "TextTransformation": "URL_DECODE"
-                    },
-                    {
-                        "FieldToMatch": {
-                            "Type": "URI"
-                        },
-                        "PositionalConstraint": "CONTAINS",
-                        "TargetString": "../",
-                        "TextTransformation": "HTML_ENTITY_DECODE"
-                    },
-                    {
-                        "FieldToMatch": {
-                            "Type": "QUERY_STRING"
-                        },
-                        "PositionalConstraint": "CONTAINS",
-                        "TargetString": "../",
-                        "TextTransformation": "URL_DECODE"
-                    },
-                    {
-                        "FieldToMatch": {
-                            "Type": "QUERY_STRING"
-                        },
-                        "PositionalConstraint": "CONTAINS",
-                        "TargetString": "../",
-                        "TextTransformation": "HTML_ENTITY_DECODE"
-                    },
-                    {
-                        "FieldToMatch": {
-                            "Type": "URI"
-                        },
-                        "PositionalConstraint": "CONTAINS",
-                        "TargetString": "://",
-                        "TextTransformation": "URL_DECODE"
-                    },
-                    {
-                        "FieldToMatch": {
-                            "Type": "URI"
-                        },
-                        "PositionalConstraint": "CONTAINS",
-                        "TargetString": "://",
-                        "TextTransformation": "HTML_ENTITY_DECODE"
-                    },
-                    {
-                        "FieldToMatch": {
-                            "Type": "QUERY_STRING"
-                        },
-                        "PositionalConstraint": "CONTAINS",
-                        "TargetString": "://",
-                        "TextTransformation": "URL_DECODE"
-                    },
-                    {
-                        "FieldToMatch": {
-                            "Type": "QUERY_STRING"
-                        },
-                        "PositionalConstraint": "CONTAINS",
-                        "TargetString": "://",
-                        "TextTransformation": "HTML_ENTITY_DECODE"
-                    }
-                ]
-            }
-        },
-        "wafgPathsStringSet": {
-            "Type": "AWS::WAF::ByteMatchSet",
-            "Condition": "isGlobal",
-            "Properties": {
-                "Name": {
-                    "Fn::Join": [
-                        "-",
-                        [
-                            {
-                                "Ref": "stackPrefix"
-                            },
-                            "match-rfi-lfi-traversal"
-                        ]
-                    ]
+                    "Fn::Sub": "WAF-match-rfi-lfi-traversal"
                 },
                 "ByteMatchTuples": [
                     {
@@ -1639,29 +961,10 @@ resource "aws_cloudformation_stack" "waf" {
         },
         "wafrPathsRule": {
             "Type": "AWS::WAFRegional::Rule",
-            "Condition": "isRegional",
             "Properties": {
-                "MetricName": {
-                    "Fn::Join": [
-                        "",
-                        [
-                            {
-                                "Ref": "stackPrefix"
-                            },
-                            "detectrfilfi"
-                        ]
-                    ]
-                },
+                "MetricName": "detectrfilfi",
                 "Name": {
-                    "Fn::Join": [
-                        "-",
-                        [
-                            {
-                                "Ref": "stackPrefix"
-                            },
-                            "detect-rfi-lfi-traversal"
-                        ]
-                    ]
+                    "Fn::Sub": "WAF-detect-rfi-lfi-traversal"
                 },
                 "Predicates": [
                     {
@@ -1674,57 +977,11 @@ resource "aws_cloudformation_stack" "waf" {
                 ]
             }
         },
-        "wafgPathsRule": {
-            "Type": "AWS::WAF::Rule",
-            "Condition": "isGlobal",
-            "Properties": {
-                "MetricName": {
-                    "Fn::Join": [
-                        "",
-                        [
-                            {
-                                "Ref": "stackPrefix"
-                            },
-                            "detectrfilfi"
-                        ]
-                    ]
-                },
-                "Name": {
-                    "Fn::Join": [
-                        "-",
-                        [
-                            {
-                                "Ref": "stackPrefix"
-                            },
-                            "detect-rfi-lfi-traversal"
-                        ]
-                    ]
-                },
-                "Predicates": [
-                    {
-                        "Type": "ByteMatch",
-                        "Negated": false,
-                        "DataId": {
-                            "Ref": "wafgPathsStringSet"
-                        }
-                    }
-                ]
-            }
-        },
         "wafrAdminUrlStringSet": {
             "Type": "AWS::WAFRegional::ByteMatchSet",
-            "Condition": "isRegional",
             "Properties": {
                 "Name": {
-                    "Fn::Join": [
-                        "-",
-                        [
-                            {
-                                "Ref": "stackPrefix"
-                            },
-                            "match-admin-url"
-                        ]
-                    ]
+                    "Fn::Sub": "WAF-match-admin-url"
                 },
                 "ByteMatchTuples": [
                     {
@@ -1732,38 +989,7 @@ resource "aws_cloudformation_stack" "waf" {
                             "Type": "URI"
                         },
                         "PositionalConstraint": "STARTS_WITH",
-                        "TargetString": {
-                            "Ref": "adminUrlPrefix"
-                        },
-                        "TextTransformation": "URL_DECODE"
-                    }
-                ]
-            }
-        },
-        "wafgAdminUrlStringSet": {
-            "Type": "AWS::WAF::ByteMatchSet",
-            "Condition": "isGlobal",
-            "Properties": {
-                "Name": {
-                    "Fn::Join": [
-                        "-",
-                        [
-                            {
-                                "Ref": "stackPrefix"
-                            },
-                            "match-admin-url"
-                        ]
-                    ]
-                },
-                "ByteMatchTuples": [
-                    {
-                        "FieldToMatch": {
-                            "Type": "URI"
-                        },
-                        "PositionalConstraint": "STARTS_WITH",
-                        "TargetString": {
-                            "Ref": "adminUrlPrefix"
-                        },
+                        "TargetString": "/admin",
                         "TextTransformation": "URL_DECODE"
                     }
                 ]
@@ -1771,79 +997,24 @@ resource "aws_cloudformation_stack" "waf" {
         },
         "wafrAdminRemoteAddrIpSet": {
             "Type": "AWS::WAFRegional::IPSet",
-            "Condition": "isRegional",
             "Properties": {
                 "Name": {
-                    "Fn::Join": [
-                        "-",
-                        [
-                            {
-                                "Ref": "stackPrefix"
-                            },
-                            "match-admin-remote-ip"
-                        ]
-                    ]
+                    "Fn::Sub": "WAF-match-admin-remote-ip"
                 },
                 "IPSetDescriptors": [
                     {
                         "Type": "IPV4",
-                        "Value": {
-                            "Ref": "adminRemoteCidr"
-                        }
-                    }
-                ]
-            }
-        },
-        "wafgAdminRemoteAddrIpSet": {
-            "Type": "AWS::WAF::IPSet",
-            "Condition": "isGlobal",
-            "Properties": {
-                "Name": {
-                    "Fn::Join": [
-                        "-",
-                        [
-                            {
-                                "Ref": "stackPrefix"
-                            },
-                            "match-admin-remote-ip"
-                        ]
-                    ]
-                },
-                "IPSetDescriptors": [
-                    {
-                        "Type": "IPV4",
-                        "Value": {
-                            "Ref": "adminRemoteCidr"
-                        }
+                        "Value": "127.0.0.1/32"
                     }
                 ]
             }
         },
         "wafrAdminAccessRule": {
             "Type": "AWS::WAFRegional::Rule",
-            "Condition": "isRegional",
             "Properties": {
-                "MetricName": {
-                    "Fn::Join": [
-                        "",
-                        [
-                            {
-                                "Ref": "stackPrefix"
-                            },
-                            "detectadminaccess"
-                        ]
-                    ]
-                },
+                "MetricName": "detectadminaccess",
                 "Name": {
-                    "Fn::Join": [
-                        "-",
-                        [
-                            {
-                                "Ref": "stackPrefix"
-                            },
-                            "detect-admin-access"
-                        ]
-                    ]
+                    "Fn::Sub": "WAF-detect-admin-access"
                 },
                 "Predicates": [
                     {
@@ -1863,388 +1034,11 @@ resource "aws_cloudformation_stack" "waf" {
                 ]
             }
         },
-        "wafgAdminAccessRule": {
-            "Type": "AWS::WAF::Rule",
-            "Condition": "isGlobal",
-            "Properties": {
-                "MetricName": {
-                    "Fn::Join": [
-                        "",
-                        [
-                            {
-                                "Ref": "stackPrefix"
-                            },
-                            "detectadminaccess"
-                        ]
-                    ]
-                },
-                "Name": {
-                    "Fn::Join": [
-                        "-",
-                        [
-                            {
-                                "Ref": "stackPrefix"
-                            },
-                            "detect-admin-access"
-                        ]
-                    ]
-                },
-                "Predicates": [
-                    {
-                        "Type": "ByteMatch",
-                        "Negated": false,
-                        "DataId": {
-                            "Ref": "wafgAdminUrlStringSet"
-                        }
-                    },
-                    {
-                        "Type": "IPMatch",
-                        "Negated": true,
-                        "DataId": {
-                            "Ref": "wafgAdminRemoteAddrIpSet"
-                        }
-                    }
-                ]
-            }
-        },
-        "wafrPHPInsecureQSStringSet": {
-            "Type": "AWS::WAFRegional::ByteMatchSet",
-            "Condition": "isRegional",
-            "Properties": {
-                "Name": {
-                    "Fn::Join": [
-                        "-",
-                        [
-                            {
-                                "Ref": "stackPrefix"
-                            },
-                            "match-php-insecure-var-refs"
-                        ]
-                    ]
-                },
-                "ByteMatchTuples": [
-                    {
-                        "FieldToMatch": {
-                            "Type": "QUERY_STRING"
-                        },
-                        "PositionalConstraint": "CONTAINS",
-                        "TargetString": "_SERVER[",
-                        "TextTransformation": "URL_DECODE"
-                    },
-                    {
-                        "FieldToMatch": {
-                            "Type": "QUERY_STRING"
-                        },
-                        "PositionalConstraint": "CONTAINS",
-                        "TargetString": "_ENV[",
-                        "TextTransformation": "URL_DECODE"
-                    },
-                    {
-                        "FieldToMatch": {
-                            "Type": "QUERY_STRING"
-                        },
-                        "PositionalConstraint": "CONTAINS",
-                        "TargetString": "auto_prepend_file=",
-                        "TextTransformation": "URL_DECODE"
-                    },
-                    {
-                        "FieldToMatch": {
-                            "Type": "QUERY_STRING"
-                        },
-                        "PositionalConstraint": "CONTAINS",
-                        "TargetString": "auto_append_file=",
-                        "TextTransformation": "URL_DECODE"
-                    },
-                    {
-                        "FieldToMatch": {
-                            "Type": "QUERY_STRING"
-                        },
-                        "PositionalConstraint": "CONTAINS",
-                        "TargetString": "allow_url_include=",
-                        "TextTransformation": "URL_DECODE"
-                    },
-                    {
-                        "FieldToMatch": {
-                            "Type": "QUERY_STRING"
-                        },
-                        "PositionalConstraint": "CONTAINS",
-                        "TargetString": "disable_functions=",
-                        "TextTransformation": "URL_DECODE"
-                    },
-                    {
-                        "FieldToMatch": {
-                            "Type": "QUERY_STRING"
-                        },
-                        "PositionalConstraint": "CONTAINS",
-                        "TargetString": "open_basedir=",
-                        "TextTransformation": "URL_DECODE"
-                    },
-                    {
-                        "FieldToMatch": {
-                            "Type": "QUERY_STRING"
-                        },
-                        "PositionalConstraint": "CONTAINS",
-                        "TargetString": "safe_mode=",
-                        "TextTransformation": "URL_DECODE"
-                    }
-                ]
-            }
-        },
-        "wafgPHPInsecureQSStringSet": {
-            "Type": "AWS::WAF::ByteMatchSet",
-            "Condition": "isGlobal",
-            "Properties": {
-                "Name": {
-                    "Fn::Join": [
-                        "-",
-                        [
-                            {
-                                "Ref": "stackPrefix"
-                            },
-                            "match-php-insecure-var-refs"
-                        ]
-                    ]
-                },
-                "ByteMatchTuples": [
-                    {
-                        "FieldToMatch": {
-                            "Type": "QUERY_STRING"
-                        },
-                        "PositionalConstraint": "CONTAINS",
-                        "TargetString": "_SERVER[",
-                        "TextTransformation": "URL_DECODE"
-                    },
-                    {
-                        "FieldToMatch": {
-                            "Type": "QUERY_STRING"
-                        },
-                        "PositionalConstraint": "CONTAINS",
-                        "TargetString": "_ENV[",
-                        "TextTransformation": "URL_DECODE"
-                    },
-                    {
-                        "FieldToMatch": {
-                            "Type": "QUERY_STRING"
-                        },
-                        "PositionalConstraint": "CONTAINS",
-                        "TargetString": "auto_prepend_file=",
-                        "TextTransformation": "URL_DECODE"
-                    },
-                    {
-                        "FieldToMatch": {
-                            "Type": "QUERY_STRING"
-                        },
-                        "PositionalConstraint": "CONTAINS",
-                        "TargetString": "auto_append_file=",
-                        "TextTransformation": "URL_DECODE"
-                    },
-                    {
-                        "FieldToMatch": {
-                            "Type": "QUERY_STRING"
-                        },
-                        "PositionalConstraint": "CONTAINS",
-                        "TargetString": "allow_url_include=",
-                        "TextTransformation": "URL_DECODE"
-                    },
-                    {
-                        "FieldToMatch": {
-                            "Type": "QUERY_STRING"
-                        },
-                        "PositionalConstraint": "CONTAINS",
-                        "TargetString": "disable_functions=",
-                        "TextTransformation": "URL_DECODE"
-                    },
-                    {
-                        "FieldToMatch": {
-                            "Type": "QUERY_STRING"
-                        },
-                        "PositionalConstraint": "CONTAINS",
-                        "TargetString": "open_basedir=",
-                        "TextTransformation": "URL_DECODE"
-                    },
-                    {
-                        "FieldToMatch": {
-                            "Type": "QUERY_STRING"
-                        },
-                        "PositionalConstraint": "CONTAINS",
-                        "TargetString": "safe_mode=",
-                        "TextTransformation": "URL_DECODE"
-                    }
-                ]
-            }
-        },
-        "wafrPHPInsecureURIStringSet": {
-            "Type": "AWS::WAFRegional::ByteMatchSet",
-            "Condition": "isRegional",
-            "Properties": {
-                "Name": {
-                    "Fn::Join": [
-                        "-",
-                        [
-                            {
-                                "Ref": "stackPrefix"
-                            },
-                            "match-php-insecure-uri"
-                        ]
-                    ]
-                },
-                "ByteMatchTuples": [
-                    {
-                        "FieldToMatch": {
-                            "Type": "URI"
-                        },
-                        "PositionalConstraint": "ENDS_WITH",
-                        "TargetString": "php",
-                        "TextTransformation": "URL_DECODE"
-                    },
-                    {
-                        "FieldToMatch": {
-                            "Type": "URI"
-                        },
-                        "PositionalConstraint": "ENDS_WITH",
-                        "TargetString": "/",
-                        "TextTransformation": "URL_DECODE"
-                    }
-                ]
-            }
-        },
-        "wafgPHPInsecureURIStringSet": {
-            "Type": "AWS::WAF::ByteMatchSet",
-            "Condition": "isGlobal",
-            "Properties": {
-                "Name": {
-                    "Fn::Join": [
-                        "-",
-                        [
-                            {
-                                "Ref": "stackPrefix"
-                            },
-                            "match-php-insecure-uri"
-                        ]
-                    ]
-                },
-                "ByteMatchTuples": [
-                    {
-                        "FieldToMatch": {
-                            "Type": "URI"
-                        },
-                        "PositionalConstraint": "ENDS_WITH",
-                        "TargetString": "php",
-                        "TextTransformation": "URL_DECODE"
-                    },
-                    {
-                        "FieldToMatch": {
-                            "Type": "URI"
-                        },
-                        "PositionalConstraint": "ENDS_WITH",
-                        "TargetString": "/",
-                        "TextTransformation": "URL_DECODE"
-                    }
-                ]
-            }
-        },
-        "wafrPHPInsecureRule": {
-            "Type": "AWS::WAFRegional::Rule",
-            "Condition": "isRegional",
-            "Properties": {
-                "MetricName": {
-                    "Fn::Join": [
-                        "",
-                        [
-                            {
-                                "Ref": "stackPrefix"
-                            },
-                            "detectphpinsecure"
-                        ]
-                    ]
-                },
-                "Name": {
-                    "Fn::Join": [
-                        "-",
-                        [
-                            {
-                                "Ref": "stackPrefix"
-                            },
-                            "detect-php-insecure"
-                        ]
-                    ]
-                },
-                "Predicates": [
-                    {
-                        "Type": "ByteMatch",
-                        "Negated": false,
-                        "DataId": {
-                            "Ref": "wafrPHPInsecureQSStringSet"
-                        }
-                    },
-                    {
-                        "Type": "ByteMatch",
-                        "Negated": false,
-                        "DataId": {
-                            "Ref": "wafrPHPInsecureURIStringSet"
-                        }
-                    }
-                ]
-            }
-        },
-        "wafgPHPInsecureRule": {
-            "Type": "AWS::WAF::Rule",
-            "Condition": "isGlobal",
-            "Properties": {
-                "MetricName": {
-                    "Fn::Join": [
-                        "",
-                        [
-                            {
-                                "Ref": "stackPrefix"
-                            },
-                            "detectphpinsecure"
-                        ]
-                    ]
-                },
-                "Name": {
-                    "Fn::Join": [
-                        "-",
-                        [
-                            {
-                                "Ref": "stackPrefix"
-                            },
-                            "detect-php-insecure"
-                        ]
-                    ]
-                },
-                "Predicates": [
-                    {
-                        "Type": "ByteMatch",
-                        "Negated": false,
-                        "DataId": {
-                            "Ref": "wafgPHPInsecureQSStringSet"
-                        }
-                    },
-                    {
-                        "Type": "ByteMatch",
-                        "Negated": false,
-                        "DataId": {
-                            "Ref": "wafgPHPInsecureURIStringSet"
-                        }
-                    }
-                ]
-            }
-        },
         "wafrSizeRestrictionSet": {
             "Type": "AWS::WAFRegional::SizeConstraintSet",
-            "Condition": "isRegional",
             "Properties": {
                 "Name": {
-                    "Fn::Join": [
-                        "-",
-                        [
-                            {
-                                "Ref": "stackPrefix"
-                            },
-                            "size-restrictions"
-                        ]
-                    ]
+                    "Fn::Sub": "WAF-size-restrictions"
                 },
                 "SizeConstraints": [
                     {
@@ -2253,9 +1047,7 @@ resource "aws_cloudformation_stack" "waf" {
                         },
                         "TextTransformation": "NONE",
                         "ComparisonOperator": "GT",
-                        "Size": {
-                            "Ref": "maxExpectedURISize"
-                        }
+                        "Size": 512
                     },
                     {
                         "FieldToMatch": {
@@ -2263,9 +1055,7 @@ resource "aws_cloudformation_stack" "waf" {
                         },
                         "TextTransformation": "NONE",
                         "ComparisonOperator": "GT",
-                        "Size": {
-                            "Ref": "maxExpectedQueryStringSize"
-                        }
+                        "Size": 1024
                     },
                     {
                         "FieldToMatch": {
@@ -2273,9 +1063,7 @@ resource "aws_cloudformation_stack" "waf" {
                         },
                         "TextTransformation": "NONE",
                         "ComparisonOperator": "GT",
-                        "Size": {
-                            "Ref": "maxExpectedBodySize"
-                        }
+                        "Size": 1048575
                     },
                     {
                         "FieldToMatch": {
@@ -2284,98 +1072,17 @@ resource "aws_cloudformation_stack" "waf" {
                         },
                         "TextTransformation": "NONE",
                         "ComparisonOperator": "GT",
-                        "Size": {
-                            "Ref": "maxExpectedCookieSize"
-                        }
-                    }
-                ]
-            }
-        },
-        "wafgSizeRestrictionSet": {
-            "Type": "AWS::WAF::SizeConstraintSet",
-            "Condition": "isGlobal",
-            "Properties": {
-                "Name": {
-                    "Fn::Join": [
-                        "-",
-                        [
-                            {
-                                "Ref": "stackPrefix"
-                            },
-                            "size-restrictions"
-                        ]
-                    ]
-                },
-                "SizeConstraints": [
-                    {
-                        "FieldToMatch": {
-                            "Type": "URI"
-                        },
-                        "TextTransformation": "NONE",
-                        "ComparisonOperator": "GT",
-                        "Size": {
-                            "Ref": "maxExpectedURISize"
-                        }
-                    },
-                    {
-                        "FieldToMatch": {
-                            "Type": "QUERY_STRING"
-                        },
-                        "TextTransformation": "NONE",
-                        "ComparisonOperator": "GT",
-                        "Size": {
-                            "Ref": "maxExpectedQueryStringSize"
-                        }
-                    },
-                    {
-                        "FieldToMatch": {
-                            "Type": "BODY"
-                        },
-                        "TextTransformation": "NONE",
-                        "ComparisonOperator": "GT",
-                        "Size": {
-                            "Ref": "maxExpectedBodySize"
-                        }
-                    },
-                    {
-                        "FieldToMatch": {
-                            "Type": "HEADER",
-                            "Data": "cookie"
-                        },
-                        "TextTransformation": "NONE",
-                        "ComparisonOperator": "GT",
-                        "Size": {
-                            "Ref": "maxExpectedCookieSize"
-                        }
+                        "Size": 4096
                     }
                 ]
             }
         },
         "wafrSizeRestrictionRule": {
             "Type": "AWS::WAFRegional::Rule",
-            "Condition": "isRegional",
             "Properties": {
-                "MetricName": {
-                    "Fn::Join": [
-                        "",
-                        [
-                            {
-                                "Ref": "stackPrefix"
-                            },
-                            "restrictsizes"
-                        ]
-                    ]
-                },
+                "MetricName": "restrictsizes",
                 "Name": {
-                    "Fn::Join": [
-                        "-",
-                        [
-                            {
-                                "Ref": "stackPrefix"
-                            },
-                            "restrict-sizes"
-                        ]
-                    ]
+                    "Fn::Sub": "WAF-restrict-sizes"
                 },
                 "Predicates": [
                     {
@@ -2388,84 +1095,11 @@ resource "aws_cloudformation_stack" "waf" {
                 ]
             }
         },
-        "wafgSizeRestrictionRule": {
-            "Type": "AWS::WAF::Rule",
-            "Condition": "isGlobal",
-            "Properties": {
-                "MetricName": {
-                    "Fn::Join": [
-                        "",
-                        [
-                            {
-                                "Ref": "stackPrefix"
-                            },
-                            "restrictsizes"
-                        ]
-                    ]
-                },
-                "Name": {
-                    "Fn::Join": [
-                        "-",
-                        [
-                            {
-                                "Ref": "stackPrefix"
-                            },
-                            "restrict-sizes"
-                        ]
-                    ]
-                },
-                "Predicates": [
-                    {
-                        "Type": "SizeConstraint",
-                        "Negated": false,
-                        "DataId": {
-                            "Ref": "wafgSizeRestrictionSet"
-                        }
-                    }
-                ]
-            }
-        },
         "wafrCSRFMethodStringSet": {
             "Type": "AWS::WAFRegional::ByteMatchSet",
-            "Condition": "isRegional",
             "Properties": {
                 "Name": {
-                    "Fn::Join": [
-                        "-",
-                        [
-                            {
-                                "Ref": "stackPrefix"
-                            },
-                            "match-csrf-method"
-                        ]
-                    ]
-                },
-                "ByteMatchTuples": [
-                    {
-                        "FieldToMatch": {
-                            "Type": "METHOD"
-                        },
-                        "PositionalConstraint": "EXACTLY",
-                        "TargetString": "post",
-                        "TextTransformation": "LOWERCASE"
-                    }
-                ]
-            }
-        },
-        "wafgCSRFMethodStringSet": {
-            "Type": "AWS::WAF::ByteMatchSet",
-            "Condition": "isGlobal",
-            "Properties": {
-                "Name": {
-                    "Fn::Join": [
-                        "-",
-                        [
-                            {
-                                "Ref": "stackPrefix"
-                            },
-                            "match-csrf-method"
-                        ]
-                    ]
+                    "Fn::Sub": "WAF-match-csrf-method"
                 },
                 "ByteMatchTuples": [
                     {
@@ -2481,93 +1115,29 @@ resource "aws_cloudformation_stack" "waf" {
         },
         "wafrCSRFTokenSizeConstraint": {
             "Type": "AWS::WAFRegional::SizeConstraintSet",
-            "Condition": "isRegional",
             "Properties": {
                 "Name": {
-                    "Fn::Join": [
-                        "-",
-                        [
-                            {
-                                "Ref": "stackPrefix"
-                            },
-                            "match-csrf-token"
-                        ]
-                    ]
+                    "Fn::Sub": "WAF-match-csrf-token"
                 },
                 "SizeConstraints": [
                     {
                         "FieldToMatch": {
                             "Type": "HEADER",
-                            "Data": {
-                                "Ref": "csrfExpectedHeader"
-                            }
+                            "Data": "x-csrf-token"
                         },
                         "TextTransformation": "NONE",
                         "ComparisonOperator": "EQ",
-                        "Size": {
-                            "Ref": "csrfExpectedSize"
-                        }
-                    }
-                ]
-            }
-        },
-        "wafgCSRFTokenSizeConstraint": {
-            "Type": "AWS::WAF::SizeConstraintSet",
-            "Condition": "isGlobal",
-            "Properties": {
-                "Name": {
-                    "Fn::Join": [
-                        "-",
-                        [
-                            {
-                                "Ref": "stackPrefix"
-                            },
-                            "match-csrf-token"
-                        ]
-                    ]
-                },
-                "SizeConstraints": [
-                    {
-                        "FieldToMatch": {
-                            "Type": "HEADER",
-                            "Data": {
-                                "Ref": "csrfExpectedHeader"
-                            }
-                        },
-                        "TextTransformation": "NONE",
-                        "ComparisonOperator": "EQ",
-                        "Size": {
-                            "Ref": "csrfExpectedSize"
-                        }
+                        "Size": 36
                     }
                 ]
             }
         },
         "wafrCSRFRule": {
             "Type": "AWS::WAFRegional::Rule",
-            "Condition": "isRegional",
             "Properties": {
-                "MetricName": {
-                    "Fn::Join": [
-                        "",
-                        [
-                            {
-                                "Ref": "stackPrefix"
-                            },
-                            "enforcecsrf"
-                        ]
-                    ]
-                },
+                "MetricName": "enforcecsrf",
                 "Name": {
-                    "Fn::Join": [
-                        "-",
-                        [
-                            {
-                                "Ref": "stackPrefix"
-                            },
-                            "enforce-csrf"
-                        ]
-                    ]
+                    "Fn::Sub": "WAF-enforce-csrf"
                 },
                 "Predicates": [
                     {
@@ -2587,64 +1157,11 @@ resource "aws_cloudformation_stack" "waf" {
                 ]
             }
         },
-        "wafgCSRFRule": {
-            "Type": "AWS::WAF::Rule",
-            "Condition": "isGlobal",
-            "Properties": {
-                "MetricName": {
-                    "Fn::Join": [
-                        "",
-                        [
-                            {
-                                "Ref": "stackPrefix"
-                            },
-                            "enforcecsrf"
-                        ]
-                    ]
-                },
-                "Name": {
-                    "Fn::Join": [
-                        "-",
-                        [
-                            {
-                                "Ref": "stackPrefix"
-                            },
-                            "enforce-csrf"
-                        ]
-                    ]
-                },
-                "Predicates": [
-                    {
-                        "Type": "ByteMatch",
-                        "Negated": false,
-                        "DataId": {
-                            "Ref": "wafgCSRFMethodStringSet"
-                        }
-                    },
-                    {
-                        "Type": "SizeConstraint",
-                        "Negated": true,
-                        "DataId": {
-                            "Ref": "wafgCSRFTokenSizeConstraint"
-                        }
-                    }
-                ]
-            }
-        },
         "wafrServerSideIncludeStringSet": {
             "Type": "AWS::WAFRegional::ByteMatchSet",
-            "Condition": "isRegional",
             "Properties": {
                 "Name": {
-                    "Fn::Join": [
-                        "-",
-                        [
-                            {
-                                "Ref": "stackPrefix"
-                            },
-                            "match-ssi"
-                        ]
-                    ]
+                    "Fn::Sub": "WAF-match-ssi"
                 },
                 "ByteMatchTuples": [
                     {
@@ -2652,94 +1169,7 @@ resource "aws_cloudformation_stack" "waf" {
                             "Type": "URI"
                         },
                         "PositionalConstraint": "STARTS_WITH",
-                        "TargetString": {
-                            "Ref": "includesPrefix"
-                        },
-                        "TextTransformation": "URL_DECODE"
-                    },
-                    {
-                        "FieldToMatch": {
-                            "Type": "URI"
-                        },
-                        "PositionalConstraint": "ENDS_WITH",
-                        "TargetString": ".cfg",
-                        "TextTransformation": "LOWERCASE"
-                    },
-                    {
-                        "FieldToMatch": {
-                            "Type": "URI"
-                        },
-                        "PositionalConstraint": "ENDS_WITH",
-                        "TargetString": ".conf",
-                        "TextTransformation": "LOWERCASE"
-                    },
-                    {
-                        "FieldToMatch": {
-                            "Type": "URI"
-                        },
-                        "PositionalConstraint": "ENDS_WITH",
-                        "TargetString": ".config",
-                        "TextTransformation": "LOWERCASE"
-                    },
-                    {
-                        "FieldToMatch": {
-                            "Type": "URI"
-                        },
-                        "PositionalConstraint": "ENDS_WITH",
-                        "TargetString": ".ini",
-                        "TextTransformation": "LOWERCASE"
-                    },
-                    {
-                        "FieldToMatch": {
-                            "Type": "URI"
-                        },
-                        "PositionalConstraint": "ENDS_WITH",
-                        "TargetString": ".log",
-                        "TextTransformation": "LOWERCASE"
-                    },
-                    {
-                        "FieldToMatch": {
-                            "Type": "URI"
-                        },
-                        "PositionalConstraint": "ENDS_WITH",
-                        "TargetString": ".bak",
-                        "TextTransformation": "LOWERCASE"
-                    },
-                    {
-                        "FieldToMatch": {
-                            "Type": "URI"
-                        },
-                        "PositionalConstraint": "ENDS_WITH",
-                        "TargetString": ".backup",
-                        "TextTransformation": "LOWERCASE"
-                    }
-                ]
-            }
-        },
-        "wafgServerSideIncludeStringSet": {
-            "Type": "AWS::WAF::ByteMatchSet",
-            "Condition": "isGlobal",
-            "Properties": {
-                "Name": {
-                    "Fn::Join": [
-                        "-",
-                        [
-                            {
-                                "Ref": "stackPrefix"
-                            },
-                            "match-ssi"
-                        ]
-                    ]
-                },
-                "ByteMatchTuples": [
-                    {
-                        "FieldToMatch": {
-                            "Type": "URI"
-                        },
-                        "PositionalConstraint": "STARTS_WITH",
-                        "TargetString": {
-                            "Ref": "includesPrefix"
-                        },
+                        "TargetString": "/includes",
                         "TextTransformation": "URL_DECODE"
                     },
                     {
@@ -2803,29 +1233,10 @@ resource "aws_cloudformation_stack" "waf" {
         },
         "wafrServerSideIncludeRule": {
             "Type": "AWS::WAFRegional::Rule",
-            "Condition": "isRegional",
             "Properties": {
-                "MetricName": {
-                    "Fn::Join": [
-                        "",
-                        [
-                            {
-                                "Ref": "stackPrefix"
-                            },
-                            "detectssi"
-                        ]
-                    ]
-                },
+                "MetricName": "detectssi",
                 "Name": {
-                    "Fn::Join": [
-                        "-",
-                        [
-                            {
-                                "Ref": "stackPrefix"
-                            },
-                            "detect-ssi"
-                        ]
-                    ]
+                    "Fn::Sub": "WAF-detect-ssi"
                 },
                 "Predicates": [
                     {
@@ -2838,59 +1249,17 @@ resource "aws_cloudformation_stack" "waf" {
                 ]
             }
         },
-        "wafgServerSideIncludeRule": {
-            "Type": "AWS::WAF::Rule",
-            "Condition": "isGlobal",
-            "Properties": {
-                "MetricName": {
-                    "Fn::Join": [
-                        "",
-                        [
-                            {
-                                "Ref": "stackPrefix"
-                            },
-                            "detectssi"
-                        ]
-                    ]
-                },
-                "Name": {
-                    "Fn::Join": [
-                        "-",
-                        [
-                            {
-                                "Ref": "stackPrefix"
-                            },
-                            "detect-ssi"
-                        ]
-                    ]
-                },
-                "Predicates": [
-                    {
-                        "Type": "ByteMatch",
-                        "Negated": false,
-                        "DataId": {
-                            "Ref": "wafgServerSideIncludeStringSet"
-                        }
-                    }
-                ]
-            }
-        },
         "wafrBlacklistIpSet": {
             "Type": "AWS::WAFRegional::IPSet",
-            "Condition": "isRegional",
             "Properties": {
                 "Name": {
-                    "Fn::Join": [
-                        "-",
-                        [
-                            {
-                                "Ref": "stackPrefix"
-                            },
-                            "match-blacklisted-ips"
-                        ]
-                    ]
+                    "Fn::Sub": "WAF-match-blacklisted-ips"
                 },
                 "IPSetDescriptors": [
+                    {
+                        "Type": "IPV4",
+                        "Value": "192.168.1.1/32"
+                    },
                     {
                         "Type": "IPV4",
                         "Value": "192.168.1.1/32"
@@ -2906,70 +1275,20 @@ resource "aws_cloudformation_stack" "waf" {
                     {
                         "Type": "IPV4",
                         "Value": "127.0.0.1/32"
-                    }
-                ]
-            }
-        },
-        "wafgBlacklistIpSet": {
-            "Type": "AWS::WAF::IPSet",
-            "Condition": "isGlobal",
-            "Properties": {
-                "Name": {
-                    "Fn::Join": [
-                        "-",
-                        [
-                            {
-                                "Ref": "stackPrefix"
-                            },
-                            "match-blacklisted-ips"
-                        ]
-                    ]
-                },
-                "IPSetDescriptors": [
-                    {
-                        "Type": "IPV4",
-                        "Value": "192.168.1.1/32"
                     },
                     {
                         "Type": "IPV4",
-                        "Value": "169.254.0.0/16"
-                    },
-                    {
-                        "Type": "IPV4",
-                        "Value": "172.16.0.0/16"
-                    },
-                    {
-                        "Type": "IPV4",
-                        "Value": "127.0.0.1/32"
+                        "Value": "10.110.123.223/32"
                     }
                 ]
             }
         },
         "wafrBlacklistIpRule": {
             "Type": "AWS::WAFRegional::Rule",
-            "Condition": "isRegional",
             "Properties": {
-                "MetricName": {
-                    "Fn::Join": [
-                        "",
-                        [
-                            {
-                                "Ref": "stackPrefix"
-                            },
-                            "blacklistedips"
-                        ]
-                    ]
-                },
+                "MetricName": "blacklistedips",
                 "Name": {
-                    "Fn::Join": [
-                        "-",
-                        [
-                            {
-                                "Ref": "stackPrefix"
-                            },
-                            "detect-blacklisted-ips"
-                        ]
-                    ]
+                    "Fn::Sub": "WAF-detect-blacklisted-ips"
                 },
                 "Predicates": [
                     {
@@ -2982,68 +1301,12 @@ resource "aws_cloudformation_stack" "waf" {
                 ]
             }
         },
-        "wafgBlacklistIpRule": {
-            "Type": "AWS::WAF::Rule",
-            "Condition": "isGlobal",
-            "Properties": {
-                "MetricName": {
-                    "Fn::Join": [
-                        "",
-                        [
-                            {
-                                "Ref": "stackPrefix"
-                            },
-                            "blacklistedips"
-                        ]
-                    ]
-                },
-                "Name": {
-                    "Fn::Join": [
-                        "-",
-                        [
-                            {
-                                "Ref": "stackPrefix"
-                            },
-                            "detect-blacklisted-ips"
-                        ]
-                    ]
-                },
-                "Predicates": [
-                    {
-                        "Type": "IPMatch",
-                        "Negated": false,
-                        "DataId": {
-                            "Ref": "wafgBlacklistIpSet"
-                        }
-                    }
-                ]
-            }
-        },
         "wafrOwaspACL": {
             "Type": "AWS::WAFRegional::WebACL",
-            "Condition": "isRegional",
             "Properties": {
-                "MetricName": {
-                    "Fn::Join": [
-                        "",
-                        [
-                            {
-                                "Ref": "stackPrefix"
-                            },
-                            "owaspacl"
-                        ]
-                    ]
-                },
+                "MetricName": "owaspacl",
                 "Name": {
-                    "Fn::Join": [
-                        "-",
-                        [
-                            {
-                                "Ref": "stackPrefix"
-                            },
-                            "owasp-acl"
-                        ]
-                    ]
+                    "Fn::Sub": "WAF-owasp-acl"
                 },
                 "DefaultAction": {
                     "Type": "ALLOW"
@@ -3051,9 +1314,7 @@ resource "aws_cloudformation_stack" "waf" {
                 "Rules": [
                     {
                         "Action": {
-                            "Type": {
-                                "Ref": "ruleAction"
-                            }
+                            "Type": "BLOCK"
                         },
                         "Priority": 10,
                         "RuleId": {
@@ -3062,9 +1323,7 @@ resource "aws_cloudformation_stack" "waf" {
                     },
                     {
                         "Action": {
-                            "Type": {
-                                "Ref": "ruleAction"
-                            }
+                            "Type": "BLOCK"
                         },
                         "Priority": 20,
                         "RuleId": {
@@ -3073,9 +1332,7 @@ resource "aws_cloudformation_stack" "waf" {
                     },
                     {
                         "Action": {
-                            "Type": {
-                                "Ref": "ruleAction"
-                            }
+                            "Type": "BLOCK"
                         },
                         "Priority": 30,
                         "RuleId": {
@@ -3084,9 +1341,7 @@ resource "aws_cloudformation_stack" "waf" {
                     },
                     {
                         "Action": {
-                            "Type": {
-                                "Ref": "ruleAction"
-                            }
+                            "Type": "BLOCK"
                         },
                         "Priority": 40,
                         "RuleId": {
@@ -3095,9 +1350,7 @@ resource "aws_cloudformation_stack" "waf" {
                     },
                     {
                         "Action": {
-                            "Type": {
-                                "Ref": "ruleAction"
-                            }
+                            "Type": "BLOCK"
                         },
                         "Priority": 50,
                         "RuleId": {
@@ -3106,9 +1359,7 @@ resource "aws_cloudformation_stack" "waf" {
                     },
                     {
                         "Action": {
-                            "Type": {
-                                "Ref": "ruleAction"
-                            }
+                            "Type": "BLOCK"
                         },
                         "Priority": 60,
                         "RuleId": {
@@ -3117,376 +1368,45 @@ resource "aws_cloudformation_stack" "waf" {
                     },
                     {
                         "Action": {
-                            "Type": {
-                                "Ref": "ruleAction"
-                            }
-                        },
-                        "Priority": 70,
-                        "RuleId": {
-                            "Ref": "wafrPHPInsecureRule"
-                        }
-                    },
-                    {
-                        "Action": {
                             "Type": "ALLOW"
                         },
-                        "Priority": 80,
+                        "Priority": 70,
                         "RuleId": {
                             "Ref": "wafrCSRFRule"
                         }
                     },
                     {
                         "Action": {
-                            "Type": {
-                                "Ref": "ruleAction"
-                            }
+                            "Type": "BLOCK"
                         },
-                        "Priority": 90,
+                        "Priority": 80,
                         "RuleId": {
                             "Ref": "wafrServerSideIncludeRule"
                         }
                     },
                     {
                         "Action": {
-                            "Type": {
-                                "Ref": "ruleAction"
-                            }
+                            "Type": "BLOCK"
                         },
-                        "Priority": 100,
+                        "Priority": 90,
                         "RuleId": {
                             "Ref": "wafrAdminAccessRule"
                         }
                     }
                 ]
             }
-        }
-    },
-    "Outputs": {
-        "wafWebACL": {
-            "Value": {
-                "Ref": "wafrOwaspACL"
-            }
         },
-        "wafWebACLMetric": {
-            "Value": {
-                "Fn::Join": [
-                    "",
-                    [
-                        {
-                            "Ref": "stackPrefix"
-                        },
-                        "owaspacl"
-                    ]
-                ]
-            }
-        },
-        "wafSQLiRule": {
-            "Value": {
-                "Fn::If": [
-                    "isRegional",
-                    {
-                        "Ref": "wafrSQLiRule"
-                    },
-                    {
-                        "Ref": "wafgSQLiRule"
-                    }
-                ]
-            }
-        },
-        "wafSQLiRuleMetric": {
-            "Value": {
-                "Fn::Join": [
-                    "",
-                    [
-                        {
-                            "Ref": "stackPrefix"
-                        },
-                        "mitigatesqli"
-                    ]
-                ]
-            }
-        },
-        "wafAuthTokenRule": {
-            "Value": {
-                "Fn::If": [
-                    "isRegional",
-                    {
-                        "Ref": "wafrAuthTokenRule"
-                    },
-                    {
-                        "Ref": "wafgAuthTokenRule"
-                    }
-                ]
-            }
-        },
-        "wafAuthTokenRuleMetric": {
-            "Value": {
-                "Fn::Join": [
-                    "",
-                    [
-                        {
-                            "Ref": "stackPrefix"
-                        },
-                        "badauthtokens"
-                    ]
-                ]
-            }
-        },
-        "wafXSSRule": {
-            "Value": {
-                "Fn::If": [
-                    "isRegional",
-                    {
-                        "Ref": "wafrXSSRule"
-                    },
-                    {
-                        "Ref": "wafgXSSRule"
-                    }
-                ]
-            }
-        },
-        "wafXSSRuleMetric": {
-            "Value": {
-                "Fn::Join": [
-                    "",
-                    [
-                        {
-                            "Ref": "stackPrefix"
-                        },
-                        "mitigatexss"
-                    ]
-                ]
-            }
-        },
-        "wafPathsRule": {
-            "Value": {
-                "Fn::If": [
-                    "isRegional",
-                    {
-                        "Ref": "wafrPathsRule"
-                    },
-                    {
-                        "Ref": "wafgPathsRule"
-                    }
-                ]
-            }
-        },
-        "wafPathsRuleMetric": {
-            "Value": {
-                "Fn::Join": [
-                    "",
-                    [
-                        {
-                            "Ref": "stackPrefix"
-                        },
-                        "detectrfilfi"
-                    ]
-                ]
-            }
-        },
-        "wafPHPMisconfigRule": {
-            "Value": {
-                "Fn::If": [
-                    "isRegional",
-                    {
-                        "Ref": "wafrPHPInsecureRule"
-                    },
-                    {
-                        "Ref": "wafgPHPInsecureRule"
-                    }
-                ]
-            }
-        },
-        "wafPHPMisconfigRuleMetric": {
-            "Value": {
-                "Fn::Join": [
-                    "",
-                    [
-                        {
-                            "Ref": "stackPrefix"
-                        },
-                        "detectphpinsecure"
-                    ]
-                ]
-            }
-        },
-        "wafAdminAccessRule": {
-            "Value": {
-                "Fn::If": [
-                    "isRegional",
-                    {
-                        "Ref": "wafrAdminAccessRule"
-                    },
-                    {
-                        "Ref": "wafgAdminAccessRule"
-                    }
-                ]
-            }
-        },
-        "wafAdminAccessRuleMetric": {
-            "Value": {
-                "Fn::Join": [
-                    "",
-                    [
-                        {
-                            "Ref": "stackPrefix"
-                        },
-                        "detectadminaccess"
-                    ]
-                ]
-            }
-        },
-        "wafCSRFRule": {
-            "Value": {
-                "Fn::If": [
-                    "isRegional",
-                    {
-                        "Ref": "wafrCSRFRule"
-                    },
-                    {
-                        "Ref": "wafgCSRFRule"
-                    }
-                ]
-            }
-        },
-        "wafCSRFRuleMetric": {
-            "Value": {
-                "Fn::Join": [
-                    "",
-                    [
-                        {
-                            "Ref": "stackPrefix"
-                        },
-                        "enforcecsrf"
-                    ]
-                ]
-            }
-        },
-        "wafSSIRule": {
-            "Value": {
-                "Fn::If": [
-                    "isRegional",
-                    {
-                        "Ref": "wafrServerSideIncludeRule"
-                    },
-                    {
-                        "Ref": "wafgServerSideIncludeRule"
-                    }
-                ]
-            }
-        },
-        "wafSSIRuleMetric": {
-            "Value": {
-                "Fn::Join": [
-                    "",
-                    [
-                        {
-                            "Ref": "stackPrefix"
-                        },
-                        "detectssi"
-                    ]
-                ]
-            }
-        },
-        "wafBlacklistIpRule": {
-            "Value": {
-                "Fn::If": [
-                    "isRegional",
-                    {
-                        "Ref": "wafrBlacklistIpRule"
-                    },
-                    {
-                        "Ref": "wafgBlacklistIpRule"
-                    }
-                ]
-            }
-        },
-        "wafBlacklistIpRuleMetric": {
-            "Value": {
-                "Fn::Join": [
-                    "",
-                    [
-                        {
-                            "Ref": "stackPrefix"
-                        },
-                        "blacklistedips"
-                    ]
-                ]
-            }
-        },
-        "wafSizeRestrictionRule": {
-            "Value": {
-                "Fn::If": [
-                    "isRegional",
-                    {
-                        "Ref": "wafrSizeRestrictionRule"
-                    },
-                    {
-                        "Ref": "wafgSizeRestrictionRule"
-                    }
-                ]
-            }
-        },
-        "wafSizeRestrictionRuleMetric": {
-            "Value": {
-                "Fn::Join": [
-                    "",
-                    [
-                        {
-                            "Ref": "stackPrefix"
-                        },
-                        "restrictsizes"
-                    ]
-                ]
-            }
-        },
-        "wafAuthTokenBlacklist": {
-            "Value": {
-                "Fn::If": [
-                    "isRegional",
-                    {
-                        "Ref": "wafrAuthTokenStringSet"
-                    },
-                    {
-                        "Ref": "wafgAuthTokenStringSet"
-                    }
-                ]
-            }
-        },
-        "wafAdminAccessWhitelist": {
-            "Value": {
-                "Fn::If": [
-                    "isRegional",
-                    {
-                        "Ref": "wafrAdminRemoteAddrIpSet"
-                    },
-                    {
-                        "Ref": "wafgAdminRemoteAddrIpSet"
-                    }
-                ]
-            }
-        },
-        "wafIpBlacklist": {
-            "Value": {
-                "Fn::If": [
-                    "isRegional",
-                    {
-                        "Ref": "wafrBlacklistIpSet"
-                    },
-                    {
-                        "Ref": "wafgBlacklistIpSet"
-                    }
-                ]
+        "MyWebACLAssociation": {
+            "Type": "AWS::WAFRegional::WebACLAssociation",
+            "DependsOn": "wafrOwaspACL",
+            "Properties": {
+                "WebACLId": {
+                    "Ref": "wafrOwaspACL"
+                },
+                "ResourceArn": "${aws_lb.loadBalance.arn}"
             }
         }
-      
-        
     }
 }
-
 STACK
 } 
-# resource "aws_wafregional_web_acl_association" "WAF_ASSOCIATION" {
-#   resource_arn = "${aws_lb.loadBalance.arn}"
-#   web_acl_id   = v
-# }
